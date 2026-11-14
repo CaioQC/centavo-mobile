@@ -14,6 +14,7 @@ O que o app da disciplina faz, o que fica de fora e quais regras do Centavo comp
 | **Orçamento por categoria** | Limite por categoria e mês, barra de gasto contra limite, "já comprometido" das parcelas e cópia dos limites do mês anterior ao abrir um mês novo ([orçamento do mês](../fluxos/orcamento-do-mes.md)). |
 | **Metas de economia** | Meta com valor-alvo e data opcional; o progresso vem de **aportes manuais**. |
 | **Conexão bancária simulada** | O usuário escolhe um banco fictício, passa por uma tela de consentimento marcada como simulação e o app importa contas e transações fictícias. |
+| **Tema claro e escuro** | Segue o tema do sistema; em Ajustes dá para fixar Claro ou Escuro ([design](design.md)). |
 | **Dados de exemplo** | O app já abre com um banco fictício conectado e cerca de três meses de transações, para a demo ter o que mostrar. Nos ajustes dá para restaurar esses dados. |
 
 ## Fica de fora
@@ -38,4 +39,4 @@ O que o app da disciplina faz, o que fica de fora e quais regras do Centavo comp
 ## Sem dado real
 Bancos, pessoas e valores são fictícios. Os bancos simulados têm nomes inventados e não imitam a marca de nenhuma instituição real.
 
-Veja também: [telas e roteiro da demo](telas-e-demo.md), [modelo de dados do app](modelo-de-dados.md).
+Veja também: [design](design.md), [telas e roteiro da demo](telas-e-demo.md), [modelo de dados do app](modelo-de-dados.md).
