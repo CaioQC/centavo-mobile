@@ -4,6 +4,16 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-14: Subagentes do Claude Code para o desenvolvimento do app mobile
+- **Decisão:** o centavo-mobile tem três subagentes versionados em `.claude/agents/`: `revisor-de-regras` (aponta violações das regras no diff, só leitura), `testador-do-core` (escreve e roda testes Vitest de `src/core`, só arquivos de teste) e `auditor-de-design` (confere telas contra o design Caderneta, só leitura). Os prompts apontam para o `CLAUDE.md` e para `docs/mobile/`, sem copiar regras. Detalhes em [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md).
+- **Motivo:**
+  - A atividade AT2-N2 sugere pesquisar e usar agentes de IA no desenvolvimento, e o Centavo tinha regras para o Claude mas nenhum agente especializado.
+  - Cada agente tem contexto próprio e ferramentas limitadas: o revisor não "conserta" nada por conta própria e não polui a conversa principal com o diff inteiro.
+  - Versionados no repositório, podem ir para o Centavo completo se funcionarem.
+- **Alternativas descartadas:** mais agentes (gerador de dados de exemplo, documentador): não cabem no prazo e custam limite de uso; um agente para tudo (perde a vantagem do contexto e das ferramentas separadas); só regras no `CLAUDE.md` (a sessão principal esquece regras em conversas longas); IA dentro do app (sem back-end, exigiria IA na nuvem com a chave no aparelho, contra a regra de que dado bancário não vai para IA na nuvem).
+- **Pendente:** o hook que roda `npm run check` depois das edições entra junto com a fundação do projeto, quando existir o `package.json`.
+- **Afeta:** [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md), `.claude/agents/`, `CLAUDE.md`, `.gitignore`
+
 ### 2026-11-14: Identidade visual Caderneta, com tema claro e escuro seguindo o sistema
 - **Decisão:** o app mobile usa a direção visual **Caderneta** (cartões claros e arredondados, uma cor por categoria, Plus Jakarta Sans, azul `#2F54EB` de destaque), com **tema escuro** feito sobre a mesma identidade. O tema segue o do sistema, e em Ajustes dá para fixar Claro ou Escuro. Tokens e regras em [design](../mobile/design.md).
 - **Motivo:** UI/UX é um dos três critérios da AT2-N2. Das duas direções prototipadas no canvas, o Caderneta lê mais rápido e as cores por categoria ajudam a achar as coisas no extrato e no orçamento; o Caio prefere o modo escuro, que foi acrescentado sem perder essas cores.
