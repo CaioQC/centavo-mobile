@@ -25,7 +25,7 @@ centavo/
 - **`apps/api`**: único lugar que fala com a Pluggy (`pluggy-sdk`, `CLIENT_ID`, `CLIENT_SECRET`) e com o banco (models e migrations do Lucid). Expõe as rotas HTTP, autenticação com 2FA, webhook e jobs.
 - **`apps/web`**: dashboard SPA (Vite + React + React Router + TanStack Query); consome `@centavo/core` para tipos, DTOs e regras de exibição. Fala com a API por HTTP. O build gera arquivos estáticos, servidos pelo próprio AdonisJS na mesma origem ([segurança e operação](seguranca-e-operacao.md)).
 
-> Um app mobile ficou como ideia futura, fora do roadmap. Se voltar, entra como `apps/mobile` consumindo o `@centavo/core` da mesma forma ([ADR 05](../adr/adr-05-offline-first-mobile.md)).
+> Um app mobile ficou como ideia futura, fora do roadmap. Se voltar, entra como `apps/mobile` consumindo o `@centavo/core` da mesma forma ([ADR 05](../adr/adr-05-offline-first-mobile.md)). O app reduzido da disciplina (centavo-mobile) não usa monorepo: ver [stack do app mobile](../mobile/stack.md).
 
 > Os tipos do banco **não** são compartilhados com o front: o contrato é o DTO da API. O `web` fala com a API pelo **Tuyau**, o cliente HTTP tipado oficial do AdonisJS 7, gerado a partir das rotas, controllers e validators (`node ace tuyau:generate`, a rodar sempre que uma rota mudar). Ele exige monorepo, o que já é o caso, e tem integração com TanStack Query (`@tuyau/react-query`).
 

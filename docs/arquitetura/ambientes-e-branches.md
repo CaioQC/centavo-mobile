@@ -2,6 +2,8 @@
 
 Como o código sai da máquina de desenvolvimento e chega ao Centavo do dia a dia. O porquê está no [registro de decisões](../decisoes/registro.md).
 
+> **No centavo-mobile este fluxo não vale:** lá há só a `main` e as branches de trabalho. Ver [fluxo de git do app mobile](../mobile/fluxo-de-git.md).
+
 ## Branches
 | Branch | Papel |
 |---|---|

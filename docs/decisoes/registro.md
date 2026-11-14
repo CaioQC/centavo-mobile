@@ -4,6 +4,18 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-14: App mobile reduzido no centavo-mobile, para a disciplina de Programação de App
+- **Decisão:** o repositório **centavo-mobile** recebe a `main` do Centavo e um app React Native (Expo) reduzido, para a atividade AT2-N2 de Programação de App. Entram: desbloqueio por biometria, início, extrato com recategorização e lançamentos manuais (com parcelas no cartão), contas manuais, orçamento por categoria, metas com aportes manuais e conexão bancária **simulada** com bancos e dados fictícios. Os dados ficam num SQLite no aparelho, sem back-end ([ADR 05](../adr/adr-05-offline-first-mobile.md), reativada com outra regra). Fluxo de git só com `main` + branches de trabalho, critérios de aceite na própria Issue e escopos `app`, `core` e `data`. Tudo descrito em `docs/mobile/` ([escopo](../mobile/escopo.md), [fluxo de git do app](../mobile/fluxo-de-git.md)).
+- **Motivo:**
+  - A disciplina pede um app React Native "que resolva um problema real", avaliado por um vídeo de ~30 s e uma apresentação; o código não é entregue. O Centavo já tem o problema e as regras especificados.
+  - Prazo de 1 a 2 semanas: só as partes que aparecem na demo, bem acabadas.
+  - Pluggy real exige back-end e mostraria dado bancário real em sala; a simulação mostra a ideia de Open Finance sem esse risco.
+  - Sem produção nem homologação, `develop` e `homolog` não teriam função; e sem `fase-N.md` (prazo curto) os critérios ficam na Issue.
+  - O GitHub não permite fork do próprio repositório; trazer a `main` mantém o histórico e a especificação junto do app.
+- **Não muda:** o Centavo completo continua Backend + Web, com o mobile como ideia futura. As notas fora de `docs/mobile/` seguem descrevendo ele.
+- **Alternativas descartadas:** projeção de fatura e assinaturas (não cabem no prazo); login com senha e TOTP (a biometria do aparelho resolve para um único usuário local); reescrever o vault inteiro para o mobile (muito trabalho e nenhum ganho na avaliação); começar o centavo-mobile vazio, só com um link para o Centavo.
+- **Afeta:** [ADR 05](../adr/adr-05-offline-first-mobile.md), `docs/mobile/`, [início](../inicio.md), [decisões de produto](../produto/decisoes-de-produto.md), [ambientes, branches e releases](../arquitetura/ambientes-e-branches.md), [monorepo](../arquitetura/monorepo.md), [roadmap](../roadmap/roadmap.md), `CLAUDE.md`, `README.md`
+
 ### 2026-11-08: Trabalho do Caio e do Claude em PRs separados
 - **Decisão:** contribuições relevantes do Caio e do Claude vão em PRs separados, mesmo quando são da mesma Issue (`Refs #N` nos anteriores, `Closes #N` no último). Contribuições pequenas não separam PR nem mudam a co-autoria. PR misto inevitável leva a co-autoria e uma seção "Divisão do trabalho" na descrição, que entra no modelo de PR como campo opcional. Detalhes em [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md).
 - **Motivo:** a linha de co-autoria vale para o commit inteiro, e o squash faz de cada PR um commit só. Num PR com back do Caio e front do Claude, a co-autoria daria a entender que o Claude fez os dois. PRs separados mantêm a autoria certa em cada commit e no `git blame`.
