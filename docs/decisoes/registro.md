@@ -4,6 +4,12 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-14: Identidade visual Caderneta, com tema claro e escuro seguindo o sistema
+- **Decisão:** o app mobile usa a direção visual **Caderneta** (cartões claros e arredondados, uma cor por categoria, Plus Jakarta Sans, azul `#2F54EB` de destaque), com **tema escuro** feito sobre a mesma identidade. O tema segue o do sistema, e em Ajustes dá para fixar Claro ou Escuro. Tokens e regras em [design](../mobile/design.md).
+- **Motivo:** UI/UX é um dos três critérios da AT2-N2. Das duas direções prototipadas no canvas, o Caderneta lê mais rápido e as cores por categoria ajudam a achar as coisas no extrato e no orçamento; o Caio prefere o modo escuro, que foi acrescentado sem perder essas cores.
+- **Alternativas descartadas:** direção **Cofre** (escura, sóbria, dourado como único destaque; boa para vídeo, mas menos amigável e sem cor por categoria); só tema escuro (ignora quem usa o celular no claro); só tema claro.
+- **Afeta:** [design](../mobile/design.md), [escopo](../mobile/escopo.md), [stack](../mobile/stack.md), [telas e roteiro da demo](../mobile/telas-e-demo.md), [modelo de dados do app](../mobile/modelo-de-dados.md)
+
 ### 2026-11-14: App mobile reduzido no centavo-mobile, para a disciplina de Programação de App
 - **Decisão:** o repositório **centavo-mobile** recebe a `main` do Centavo e um app React Native (Expo) reduzido, para a atividade AT2-N2 de Programação de App. Entram: desbloqueio por biometria, início, extrato com recategorização e lançamentos manuais (com parcelas no cartão), contas manuais, orçamento por categoria, metas com aportes manuais e conexão bancária **simulada** com bancos e dados fictícios. Os dados ficam num SQLite no aparelho, sem back-end ([ADR 05](../adr/adr-05-offline-first-mobile.md), reativada com outra regra). Fluxo de git só com `main` + branches de trabalho, critérios de aceite na própria Issue e escopos `app`, `core` e `data`. Tudo descrito em `docs/mobile/` ([escopo](../mobile/escopo.md), [fluxo de git do app](../mobile/fluxo-de-git.md)).
 - **Motivo:**

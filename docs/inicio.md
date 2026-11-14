@@ -12,6 +12,7 @@ Sistema de gerenciamento financeiro pessoal integrado à API da **Pluggy (Open F
 - [Visão do app mobile](mobile/visao.md)
 - [Escopo: o que entra, o que fica de fora](mobile/escopo.md)
 - [Stack do app mobile](mobile/stack.md)
+- [Design: identidade visual e temas](mobile/design.md)
 - [Modelo de dados do app mobile](mobile/modelo-de-dados.md)
 - [Telas e roteiro da demo](mobile/telas-e-demo.md)
 - [Roadmap do app mobile](mobile/roadmap.md)

@@ -84,5 +84,5 @@ Lista fixa e enxuta, criada na primeira migração (ex.: Moradia, Alimentação,
 **Progresso** = soma dos aportes ÷ `target_in_cents`. Aportes não movimentam as contas: a meta é um acompanhamento à parte.
 
 ## `settings`
-- `key`: TEXT (PK) — ex.: `biometric_lock_enabled`, `sample_data_version`
+- `key`: TEXT (PK) — ex.: `biometric_lock_enabled`, `theme` (`SYSTEM`, `LIGHT`, `DARK`), `sample_data_version`
 - `value`: TEXT

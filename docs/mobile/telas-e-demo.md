@@ -1,6 +1,6 @@
 # Telas e roteiro da demo
 
-As telas do app mobile e o roteiro do vídeo de cerca de 30 segundos da AT2-N2. O que cada funcionalidade faz está no [escopo](escopo.md).
+As telas do app mobile e o roteiro do vídeo de cerca de 30 segundos da AT2-N2. O que cada funcionalidade faz está no [escopo](escopo.md); cores, fontes e temas, no [design](design.md).
 
 ## Navegação
 ```mermaid
@@ -23,15 +23,15 @@ flowchart LR
 |---|---|
 | **Desbloqueio** | Logo e pedido de biometria. Abre sozinho ao iniciar e ao voltar do segundo plano. |
 | **Início** | Saldo somado das contas; anel do gasto do mês contra o orçamento total; as três categorias que mais gastaram; últimas transações; atalhos para contas e ajustes. |
-| **Extrato** | Transações agrupadas por dia, com seletor de mês, filtros de conta e categoria e busca. Valor em vermelho (despesa) ou verde (receita); parcela mostrada como "2/3". |
+| **Extrato** | Transações agrupadas por dia, com seletor de mês, filtros de conta e categoria e busca. Despesa com "−" na cor do texto, receita com "+" em verde (`income`); parcela mostrada como "2/3". |
 | **Detalhe da transação** | Conta, data, valor, categoria (trocável), observação. Lançamento manual tem "Excluir". |
 | **Novo lançamento** | Botão "+" nas abas. Tipo (despesa/receita), valor digitado em centavos, descrição, conta, categoria, data e, se a conta for cartão, número de parcelas. |
-| **Orçamento** | Seletor de mês; por categoria, barra de gasto contra limite (verde, amarelo a partir de 80%, vermelho acima de 100%) e "já comprometido" em destaque; edição dos limites. |
+| **Orçamento** | Seletor de mês; por categoria, barra de gasto contra limite na cor da categoria, que passa a âmbar com "Atenção" a partir de 80% e a laranja com "Estourou" acima de 100% ([design](design.md)), e "já comprometido" em destaque; edição dos limites. |
 | **Metas** | Cartões com nome, progresso e quanto falta. "Nova meta". |
 | **Detalhe da meta** | Progresso, data-alvo, lista de aportes, "Novo aporte" e "Retirar". |
 | **Contas e conexões** | Contas agrupadas por banco, com saldo; "Nova conta manual"; "Conectar banco". |
 | **Conectar banco simulado** | Lista de bancos fictícios → consentimento (que dados serão lidos, com o aviso "simulação") → "Sincronizando…" → resumo do que foi importado. |
-| **Ajustes** | Desbloqueio por biometria liga/desliga; "Restaurar dados de exemplo". |
+| **Ajustes** | Desbloqueio por biometria liga/desliga; tema (Sistema, Claro, Escuro); "Restaurar dados de exemplo". |
 
 Toda lista tem estado vazio com uma ação (ex.: "Nenhuma meta ainda. Criar meta").
 
