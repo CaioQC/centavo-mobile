@@ -37,6 +37,21 @@ A linha de co-autoria vale para o commit inteiro, e cada PR vira um commit só n
 ## Dados bancários reais nunca vão para o Claude
 O Claude Code é IA na nuvem. Nada de colar numa conversa, nem no PC: JSON bruto da Pluggy, extratos, saldos reais, o `.env` ou backups. Para depurar, usar as fixtures anonimizadas ([testes](testes.md)). É a mesma regra da IA do produto ([IA local](ia-local.md)).
 
+## Agentes (centavo-mobile)
+Subagentes do Claude Code com uma tarefa só, contexto próprio e ferramentas limitadas. Ficam em `.claude/agents/`, versionados como código, e mudam por PR. O prompt de cada um **aponta** para o `CLAUDE.md` e as notas de `docs/mobile/`, sem copiar as regras, para não divergirem.
+
+| Agente | Tarefa | Pode editar? | Modelo | Quando usar |
+|---|---|---|---|---|
+| `revisor-de-regras` | Aponta no diff violações das regras do app (centavos, datas, `src/core` puro, SQL só em `src/data`, parcelas, anotações, textos) | Não | Sonnet | Uma vez por PR com código, antes de propor o commit |
+| `testador-do-core` | Escreve e roda testes Vitest de `src/core`, com os casos de borda do projeto; escreve o teste de regressão de um bug e mostra que ele falha | Só `src/core/**/*.test.ts` | Sonnet | Função nova ou alterada em `src/core`; bug em `src/core` |
+| `auditor-de-design` | Confere telas contra o [design](../mobile/design.md): tokens nos dois temas, área de toque, acessibilidade, estados vazios | Não | Haiku | Tela nova ou alterada; antes de gravar o vídeo |
+
+- **Complementam, não substituem:** regra que dá para checar por máquina vai para lint, teste ou hook. O agente é para o que pede julgamento. A revisão do Caio no PR continua obrigatória: o revisor é o mesmo modelo que escreveu o código e tem os mesmos pontos cegos.
+- **Limites são instruções:** o campo `tools` libera ferramentas inteiras (o testador tem `Write`; o revisor, `Bash`), e o "só `*.test.ts`" ou "só git de leitura" está no prompt. As permissões do Claude Code continuam valendo por cima.
+- **Custo:** cada agente começa do zero e consome o mesmo limite de uso do plano. Por isso, uma vez por PR, não a cada edição. O auditor usa um modelo menor (Haiku), porque a tarefa é quase toda busca.
+- **Co-autoria:** testes escritos pelo `testador-do-core` são código do Claude e levam a linha de co-autoria; apontamentos do revisor e do auditor, não.
+- **Para o Centavo completo:** se derem certo, a pasta vai para o Centavo trocando as regras específicas (AdonisJS, Lucid e Pluggy no lugar de SQLite e da importação simulada).
+
 ## Revisão possível
 - **PRs pequenos quando o Claude é o agente:** um assunto por PR, para a revisão ser de verdade.
 - **Mesmas regras de qualidade:** o código escrito pelo Claude segue as mesmas exigências do código do Caio: testes, critérios de aceite do `fase-N.md` e teste de regressão ([testes](testes.md)).
