@@ -52,6 +52,34 @@ Subagentes do Claude Code com uma tarefa só, contexto próprio e ferramentas li
 - **Co-autoria:** testes escritos pelo `testador-do-core` são código do Claude e levam a linha de co-autoria; apontamentos do revisor e do auditor, não.
 - **Para o Centavo completo:** se derem certo, a pasta vai para o Centavo trocando as regras específicas (AdonisJS, Lucid e Pluggy no lugar de SQLite e da importação simulada).
 
+## Sessões do Claude Code
+O contexto de uma sessão é limitado: quando enche, a conversa é compactada e detalhes se perdem. Por isso cada sessão é **descartável**: tudo o que importa fica no repositório, e uma sessão nova recomeça lendo o `CLAUDE.md`, o vault e a Issue, não a conversa anterior.
+
+### Uma sessão por tarefa
+- **O tamanho de uma sessão é o de um PR:** Issue nova ou PR novo, sessão nova. Merge feito, a sessão daquele PR acabou.
+- **Planejar e implementar em sessões separadas:** planejamento (escopo, arquitetura, design, decisões) numa sessão com modelo mais capaz; implementação numa sessão nova, com modelo mais leve, a partir do que foi registrado no vault.
+- **Desvio longo** (um bug que puxa uma depuração demorada): sessão própria para ele, e volta.
+
+### Sinais de que é hora de trocar
+- A conversa foi compactada: a partir daí a sessão já perdeu detalhes. Feche a tarefa atual e siga numa sessão nova.
+- O Claude esquece regras do `CLAUDE.md` ou repete perguntas já respondidas.
+- A tarefa mudou de assunto.
+
+### Passagem de bastão
+1. **Decisões no vault:** [registro de decisões](../decisoes/registro.md), notas e ADRs, como já é regra.
+2. **Estado da tarefa na Issue:** ao encerrar uma sessão no meio do trabalho, o Claude deixa um comentário na Issue com o que foi feito, o que falta e onde parou. A sessão seguinte começa lendo a Issue. Nada de arquivo de "handoff" solto: tarefa vive na Issue ([convenções](convencoes-de-git.md)).
+3. **Trabalho salvo na branch:** a sessão seguinte parte de commits, não de alterações soltas na pasta.
+
+### Contexto enxuto
+- **`CLAUDE.md` curto:** ele entra em toda sessão, a cada mensagem. Regra de uma parte só do código vai num `CLAUDE.md` da pasta dela (no Centavo completo, `apps/api/CLAUDE.md` e `apps/web/CLAUDE.md`), que o Claude Code só carrega quando trabalha ali. O da raiz fica com o que vale para tudo.
+- **Subagentes para leitura pesada** (varrer código, rodar a suíte, ler logs): o resultado volta resumido e a conversa principal não carrega o volume (seção "Agentes", acima).
+- **Leia só as notas do assunto:** a regra do `CLAUDE.md` vale também para o brief de uma sessão nova; aponte as notas, não as cole.
+
+### Sessões em paralelo e custo
+- Tarefas independentes (ex.: a API de uma Issue e o web de outra) podem rodar em sessões paralelas, cada uma na sua *worktree*, sem tocar nos mesmos arquivos.
+- Todas consomem o mesmo limite de uso do plano: duas sessões ao mesmo tempo gastam o dobro. Paralelo só quando o prazo pede.
+- **Modelo por tarefa:** o mais leve que resolve. Planejamento e decisões difíceis num modelo maior; implementação de algo já decidido num intermediário; busca e varredura no menor.
+
 ## Revisão possível
 - **PRs pequenos quando o Claude é o agente:** um assunto por PR, para a revisão ser de verdade.
 - **Mesmas regras de qualidade:** o código escrito pelo Claude segue as mesmas exigências do código do Caio: testes, critérios de aceite do `fase-N.md` e teste de regressão ([testes](testes.md)).

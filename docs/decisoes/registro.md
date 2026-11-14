@@ -4,6 +4,12 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-14: Uma sessão do Claude Code por tarefa, com o estado na Issue
+- **Decisão:** cada sessão do Claude Code cobre uma tarefa (o tamanho de um PR); planejamento e implementação ficam em sessões separadas, com o modelo mais leve que resolve cada uma. Ao trocar de tarefa, depois de um merge ou de uma compactação da conversa, segue-se numa sessão nova. O estado de uma tarefa interrompida vai num comentário da Issue; decisões, no vault. Regras de uma parte só do código vão no `CLAUDE.md` da pasta dela. Detalhes em [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md).
+- **Motivo:** o contexto de uma sessão é limitado; quando enche, a conversa é compactada e perde detalhes, e a qualidade cai. Com o estado todo no repositório, uma sessão nova recomeça sem perda e com contexto menor, o que também gasta menos do limite do plano. Vale para o Centavo completo, que vai crescer bem mais que o app da disciplina.
+- **Alternativas descartadas:** uma sessão longa por projeto (compactação e perda de regras); arquivo de "handoff" no repositório (duplica a Issue, contra a regra de tarefas nas Issues); sessões paralelas como padrão (dobram o consumo do limite).
+- **Afeta:** [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md), `CLAUDE.md`
+
 ### 2026-11-14: Subagentes do Claude Code para o desenvolvimento do app mobile
 - **Decisão:** o centavo-mobile tem três subagentes versionados em `.claude/agents/`: `revisor-de-regras` (aponta violações das regras no diff, só leitura), `testador-do-core` (escreve e roda testes Vitest de `src/core`, só arquivos de teste) e `auditor-de-design` (confere telas contra o design Caderneta, só leitura). Os prompts apontam para o `CLAUDE.md` e para `docs/mobile/`, sem copiar regras. Detalhes em [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md).
 - **Motivo:**
