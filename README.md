@@ -2,7 +2,7 @@
 
 App mobile de finanças pessoais, versão reduzida do [Centavo](https://github.com/CaioQC/Centavo), feito em React Native para a disciplina de Programação de App (UCB). Junta as contas num lugar só e responde três perguntas: **para onde foi o meu dinheiro, quanto ainda posso gastar em cada categoria e quanto falta para a minha meta.**
 
-**Status:** em desenvolvimento. Especificação pronta em `docs/mobile/`; nenhum código ainda.
+**Status:** em desenvolvimento. Etapa 0 (fundação) pronta: abas, tema, SQLite e `src/core`; as telas ainda estão vazias. Especificação em `docs/mobile/`.
 
 **Funcionalidades:** desbloqueio por biometria · dashboard · extrato com categorias · lançamentos manuais com parcelas no cartão · orçamento por categoria · metas de economia · conexão bancária simulada (Open Finance com bancos e dados fictícios).
 

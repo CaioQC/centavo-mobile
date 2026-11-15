@@ -30,3 +30,12 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Expo / React Native
+.expo/
+expo-env.d.ts
+web-build/
+ios/
+android/
+*.tsbuildinfo
+npm-debug.log*
