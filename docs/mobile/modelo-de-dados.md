@@ -39,7 +39,7 @@ Versão reduzida do [modelo de dados do Centavo](../dominio/modelo-de-dados.md),
 - `external_id`: TEXT (nulável; ID no banco fictício, único por conta, para a importação não duplicar)
 - `description`: TEXT
 - `amount_in_cents`: INTEGER (positivo para receitas e estornos, negativo para despesas)
-- `date`: TEXT (`YYYY-MM-DD`)
+- `date`: TEXT (`YYYY-MM-DD`); a parcela k de uma compra tem a data da compra + (k − 1) meses, e o extrato do mês filtra por esta data
 - `budget_month`: TEXT (`YYYY-MM`; [ADR 11](../adr/adr-11-orcamento-cartao-parcelado.md))
 - `category_id`: TEXT (FK -> categories.id, nulável)
 - `category_source`: TEXT (`IMPORT`, `MANUAL`; [ADR 07](../adr/adr-07-categorizacao-em-camadas.md))

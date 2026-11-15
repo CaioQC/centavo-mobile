@@ -4,6 +4,12 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-14: Parcelas do app têm data própria, e o extrato filtra por `date`
+- **Decisão:** a parcela k de uma compra tem `date` = data da compra + (k − 1) meses (dia limitado ao fim do mês: 31/01 → 28/02) e `budget_month` = mês dessa data (igual ao mês da compra + (k − 1) da [ADR 11](../adr/adr-11-orcamento-cartao-parcelado.md)). O extrato do mês lista as transações cujo `date` cai no mês, então a parcela 2/3 aparece no extrato do mês seguinte, com data futura. Vale para as parcelas lançadas no app e para as do banco fictício (que "lança todas de uma vez").
+- **Motivo:** é o caso "banco que lança todas as parcelas de uma vez, com datas futuras" da ADR 11; mantém `date` e `budget_month` coerentes e deixa o extrato igual à fatura de cartão real.
+- **Alternativas descartadas:** todas as parcelas com a data da compra (o extrato do mês da compra mostraria o total parcelado de uma vez e o das parcelas seguintes ficaria vazio); filtrar o extrato por `budget_month` (misturaria o mês de competência com o dia em que o lançamento aparece).
+- **Afeta:** [modelo de dados do app](../mobile/modelo-de-dados.md), [telas e demo](../mobile/telas-e-demo.md)
+
 ### 2026-11-14: Expo SDK 58 em vez do 57
 - **Decisão:** o app usa o Expo SDK 58 (React Native 0.88), não o 57 que a [stack](../mobile/stack.md) previa.
 - **Motivo:** o 58 é o estável mais recente (changelog de 15/10/2026). O Expo Go roda um SDK por vez, e a versão nova suporta só o 58; nas lojas, o do SDK 57 não é garantido (no iPhone nunca se instala Expo Go antigo). O Garago já está no 58, então o mesmo Expo Go serve aos dois projetos. A migração foi feita na fundação, antes de haver telas, quando custa quase nada.
