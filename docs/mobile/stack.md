@@ -4,7 +4,7 @@ Substitui a [stack do Centavo completo](../arquitetura/stack.md) no centavo-mobi
 
 | Camada | Tecnologia | Justificativa |
 |---|---|---|
-| **App** | Expo SDK 57 + React Native + TypeScript (strict) | Pedido da disciplina (React Native); mesma base já usada pelo Caio no Garago. Roda no Expo Go para a demo. |
+| **App** | Expo SDK 58 + React Native + TypeScript (strict) | Pedido da disciplina (React Native); mesma base (SDK 58) do Garago. Roda no Expo Go para a demo, que só abre projetos do SDK que ele suporta (hoje o 58). |
 | **Navegação** | Expo Router (rotas por arquivo, abas) | Padrão do Expo; abas para as quatro áreas principais ([telas](telas-e-demo.md)). |
 | **Dados** | `expo-sqlite` com SQL direto e migrações versionadas por `PRAGMA user_version` | Banco relacional no aparelho, com as mesmas tabelas simplificadas do Centavo ([modelo de dados do app](modelo-de-dados.md)). Sem ORM: poucas tabelas e consultas simples. |
 | **Biometria** | `expo-local-authentication` | Digital ou rosto com o PIN do aparelho como alternativa. No iOS, o Face ID não funciona no Expo Go (precisa de *development build*); no Android, a digital funciona no Expo Go. |

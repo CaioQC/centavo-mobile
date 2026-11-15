@@ -4,6 +4,18 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-14: Expo SDK 58 em vez do 57
+- **Decisão:** o app usa o Expo SDK 58 (React Native 0.88), não o 57 que a [stack](../mobile/stack.md) previa.
+- **Motivo:** o 58 é o estável mais recente (changelog de 15/10/2026). O Expo Go roda um SDK por vez, e a versão nova suporta só o 58; nas lojas, o do SDK 57 não é garantido (no iPhone nunca se instala Expo Go antigo). O Garago já está no 58, então o mesmo Expo Go serve aos dois projetos. A migração foi feita na fundação, antes de haver telas, quando custa quase nada.
+- **Alternativas descartadas:** ficar no 57 (arrisca não abrir no Expo Go da demo); development build (mais trabalho e exige conta/compilação, sem necessidade para o escopo).
+- **Afeta:** [stack do app](../mobile/stack.md)
+
+### 2026-11-14: Hook que roda o `npm run check` ao fim de cada resposta do Claude
+- **Decisão:** `.claude/settings.json` tem um hook `Stop` que roda `node .claude/hooks/run-check.mjs`: se houve mudança fora de `docs/` e de arquivos `.md`, roda `npm run check`; se falhar, o resultado volta ao Claude (código de saída 2) para ele corrigir antes de encerrar. O CI do GitHub Actions roda o mesmo `npm run check` em todo PR e push na `main`.
+- **Motivo:** resolve o pendente do registro dos subagentes. A regra que dá para checar por máquina vai para a máquina; `Stop` (e não a cada edição) evita rodar tudo a cada arquivo salvo, e o filtro por `docs/` evita custo em turnos só de documentação. O hook ignora a si mesmo na segunda passada (`stop_hook_active`) para não entrar em laço.
+- **Alternativas descartadas:** hook `PostToolUse` a cada `Edit`/`Write` (lento e ruidoso com edições em sequência); só o CI (o erro aparece depois do push).
+- **Afeta:** [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md)
+
 ### 2026-11-14: Uma sessão do Claude Code por tarefa, com o estado na Issue
 - **Decisão:** cada sessão do Claude Code cobre uma tarefa (o tamanho de um PR); planejamento e implementação ficam em sessões separadas, com o modelo mais leve que resolve cada uma. Ao trocar de tarefa, depois de um merge ou de uma compactação da conversa, segue-se numa sessão nova. O estado de uma tarefa interrompida vai num comentário da Issue; decisões, no vault. Regras de uma parte só do código vão no `CLAUDE.md` da pasta dela. Detalhes em [uso de IA no desenvolvimento](../arquitetura/uso-de-ia-no-desenvolvimento.md).
 - **Motivo:** o contexto de uma sessão é limitado; quando enche, a conversa é compactada e perde detalhes, e a qualidade cai. Com o estado todo no repositório, uma sessão nova recomeça sem perda e com contexto menor, o que também gasta menos do limite do plano. Vale para o Centavo completo, que vai crescer bem mais que o app da disciplina.

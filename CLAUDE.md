@@ -1,6 +1,6 @@
 # Centavo Mobile
 
-App mobile (Expo + React Native + TypeScript) de finanças pessoais, **versão reduzida do Centavo** feita para a atividade AT2-N2 da disciplina de Programação de App (UCB). Avaliado por um vídeo de ~30 s e uma apresentação em sala; prazo de 1 a 2 semanas a partir de 14/11/2026. **Estado atual: só documentação; nenhum código ainda.**
+App mobile (Expo + React Native + TypeScript) de finanças pessoais, **versão reduzida do Centavo** feita para a atividade AT2-N2 da disciplina de Programação de App (UCB). Avaliado por um vídeo de ~30 s e uma apresentação em sala; prazo de 1 a 2 semanas a partir de 14/11/2026. **Estado atual: etapa 0 (fundação) pronta: projeto Expo com as quatro abas, tema, SQLite com a migração 1 e `src/core` com centavos e datas; as telas ainda são vazias.**
 
 Este repositório nasceu da `main` do [Centavo](https://github.com/CaioQC/Centavo) (remote `upstream`), que é Backend + Web com a Pluggy. O vault em `docs/` veio junto: **o que vale para o app está em `docs/mobile/`**; o resto descreve o Centavo completo e serve de referência para as regras de negócio. Comece por [docs/mobile/escopo.md](docs/mobile/escopo.md); o índice geral é [docs/inicio.md](docs/inicio.md).
 
@@ -57,7 +57,7 @@ Leia só as notas do assunto da tarefa; não é preciso ler o vault inteiro.
 - Plugin da comunidade do Obsidian que guarde chave de API: `docs/.obsidian/plugins/` entra no `.gitignore` **antes** de qualquer commit.
 - O backlog é só de tarefas do projeto; arrumação pessoal do repositório não entra no vault.
 
-## Regras de código do app mobile (quando houver código)
+## Regras de código do app mobile
 Stack e pastas em `docs/mobile/stack.md`. Comandos: `npm start` (Expo Go) e `npm run check` (typecheck + lint + Vitest).
 1. **Strict TypeScript:** todo o código fortemente tipado. Evite `any`.
 2. **`src/core` é puro:** nada de SQLite, Expo nem React nele. Regras de centavos, datas, orçamento e metas ficam lá, com testes em Vitest.

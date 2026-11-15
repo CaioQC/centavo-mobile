@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Centavo",
+    "slug": "centavo-mobile",
+    "scheme": "centavo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": { "supportsTablet": false },
+    "android": { "package": "br.com.caioqc.centavo" },
+    "plugins": ["expo-router", "expo-sqlite", "expo-font", "expo-splash-screen"]
+  }
+}
