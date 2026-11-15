@@ -79,3 +79,13 @@ export function budgetMonth(purchaseDate: LocalDate, installmentNumber = 1): Yea
   }
   return addMonths(monthOf(purchaseDate), installmentNumber - 1);
 }
+
+/**
+ * Primeiro dia do mês e primeiro dia do mês seguinte: o intervalo `[start, endExclusive)` que
+ * seleciona os dias de um mês com `date >= start AND date < endExclusive`.
+ * Como os dias são texto "YYYY-MM-DD", a comparação alfabética é a cronológica.
+ */
+export function monthRange(month: YearMonth): { start: LocalDate; endExclusive: LocalDate } {
+  if (!isValidYearMonth(month)) throw new RangeError(`Mês inválido: ${month}`);
+  return { start: `${month}-01`, endExclusive: `${addMonths(month, 1)}-01` };
+}

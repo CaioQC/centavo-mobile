@@ -5,6 +5,7 @@ import {
   currentMonth,
   isValidLocalDate,
   isValidYearMonth,
+  monthRange,
   monthOf,
   todayLocal,
   toLocalDate,
@@ -154,5 +155,20 @@ describe('budgetMonth', () => {
 
   it('lança para data de compra inválida', () => {
     expect(() => budgetMonth('2026-02-29', 1)).toThrow(RangeError);
+  });
+});
+
+describe('monthRange', () => {
+  it('vai do dia 1 ao dia 1 do mês seguinte', () => {
+    expect(monthRange('2026-11')).toEqual({ start: '2026-11-01', endExclusive: '2026-12-01' });
+  });
+
+  it('em dezembro vira o ano', () => {
+    expect(monthRange('2026-12')).toEqual({ start: '2026-12-01', endExclusive: '2027-01-01' });
+  });
+
+  it('lança para mês inválido', () => {
+    expect(() => monthRange('2026-13')).toThrow(RangeError);
+    expect(() => monthRange('2026-11-01')).toThrow(RangeError);
   });
 });
