@@ -27,6 +27,8 @@ export interface ColorTokens {
   over: string;
   /** valor de receita */
   income: string;
+  /** véu atrás das folhas de opções */
+  overlay: string;
 }
 
 export const colors: Record<ColorScheme, ColorTokens> = {
@@ -43,6 +45,7 @@ export const colors: Record<ColorScheme, ColorTokens> = {
     warn: '#A15C07',
     over: '#C2410C',
     income: '#15803D',
+    overlay: 'rgba(15, 18, 24, 0.4)',
   },
   dark: {
     bg: '#0F1218',
@@ -58,6 +61,7 @@ export const colors: Record<ColorScheme, ColorTokens> = {
     warn: '#FBBF24',
     over: '#FB923C',
     income: '#86EFAC',
+    overlay: 'rgba(0, 0, 0, 0.6)',
   },
 };
 

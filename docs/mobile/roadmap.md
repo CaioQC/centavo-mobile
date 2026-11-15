@@ -5,7 +5,7 @@ Prazo: **1 a 2 semanas** a partir de 14/11/2026, até o vídeo e a apresentaçã
 | Etapa | Status | Entrega |
 |---|---|---|
 | 0. Fundação | ✅ Concluída | Projeto Expo na raiz, Expo Router com as abas, tema (cores, tipografia, espaçamento), SQLite com a primeira migração e as categorias, `src/core` com centavos e datas e seus testes, `npm run check` e CI no GitHub Actions. Ver [stack](stack.md). |
-| 1. Dados e extrato | ⬜ Não iniciada | Dados de exemplo (banco fictício conectado e ~3 meses de transações), extrato com filtros e busca, detalhe com recategorização e observação, novo lançamento (com parcelas no cartão). |
+| 1. Dados e extrato | 🟨 Em andamento | Dados de exemplo (banco fictício conectado e ~3 meses de transações), extrato com filtros e busca, detalhe com recategorização e observação, novo lançamento (com parcelas no cartão). |
 | 2. Início e desbloqueio | ⬜ Não iniciada | Dashboard, contas e contas manuais, desbloqueio por biometria e ajustes. |
 | 3. Orçamento | ⬜ Não iniciada | Limites por categoria e mês, cópia do mês anterior, "já comprometido" ([orçamento do mês](../fluxos/orcamento-do-mes.md)). |
 | 4. Metas | ⬜ Não iniciada | Metas, aportes e retiradas. |

@@ -23,3 +23,13 @@ export function formatCents(amountInCents: number): string {
   }
   return currencyFormatter.format(amountInCents / 100);
 }
+
+/**
+ * Valor com sinal para o extrato: despesa "−R$ 49,90" (sinal de menos U+2212), receita "+R$ 1.000,00",
+ * zero sem sinal ("R$ 0,00").
+ */
+export function formatSignedCents(amountInCents: number): string {
+  if (amountInCents === 0) return formatCents(0);
+  const sign = amountInCents < 0 ? '−' : '+';
+  return `${sign}${formatCents(Math.abs(amountInCents))}`;
+}

@@ -9,7 +9,7 @@ export const fontFamily = {
   extrabold: 'PlusJakartaSans_800ExtraBold',
 } as const;
 
-export type TextVariant = 'title' | 'heading' | 'body' | 'bodyStrong' | 'caption' | 'money';
+export type TextVariant = 'title' | 'heading' | 'body' | 'bodyStrong' | 'caption' | 'captionMoney' | 'money';
 
 export const textStyles: Record<TextVariant, TextStyle> = {
   title: { fontFamily: fontFamily.extrabold, fontSize: 28, lineHeight: 34 },
@@ -18,5 +18,7 @@ export const textStyles: Record<TextVariant, TextStyle> = {
   bodyStrong: { fontFamily: fontFamily.semibold, fontSize: 15, lineHeight: 22 },
   caption: { fontFamily: fontFamily.medium, fontSize: 12, lineHeight: 16 },
   // Algarismos tabulares: os números não "dançam" nas listas.
+  // Valor em corpo pequeno (totais do dia, resumo do mês).
+  captionMoney: { fontFamily: fontFamily.medium, fontSize: 12, lineHeight: 16, fontVariant: ['tabular-nums'] },
   money: { fontFamily: fontFamily.bold, fontSize: 15, lineHeight: 22, fontVariant: ['tabular-nums'] },
 };

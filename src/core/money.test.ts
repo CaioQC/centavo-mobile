@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCents, MAX_AMOUNT_DIGITS, parseDigitsToCents } from './money';
+import { formatCents, formatSignedCents, MAX_AMOUNT_DIGITS, parseDigitsToCents } from './money';
 
 // O Intl pt-BR separa "R$" do número com um espaço não separável (U+00A0).
 const NBSP = ' ';
@@ -83,5 +83,49 @@ describe('formatCents', () => {
 
   it('rejeita inteiro acima do seguro', () => {
     expect(() => formatCents(Number.MAX_SAFE_INTEGER + 1)).toThrow(RangeError);
+  });
+});
+
+describe('formatSignedCents', () => {
+  const MINUS = '−'; // sinal de menos U+2212, não o hífen "-"
+
+  it('zero sai sem sinal', () => {
+    expect(formatSignedCents(0)).toBe(`R$${NBSP}0,00`);
+    expect(formatSignedCents(0)).not.toContain('+');
+    expect(formatSignedCents(0)).not.toContain(MINUS);
+  });
+
+  it('1 centavo positivo tem "+" e 1 centavo negativo tem o menos', () => {
+    expect(formatSignedCents(1)).toBe(`+R$${NBSP}0,01`);
+    expect(formatSignedCents(-1)).toBe(`${MINUS}R$${NBSP}0,01`);
+  });
+
+  it('despesa usa o sinal de menos U+2212 antes do R$', () => {
+    expect(formatSignedCents(-4990)).toBe(`${MINUS}R$${NBSP}49,90`);
+    expect(formatSignedCents(-4990).charCodeAt(0)).toBe(0x2212);
+    expect(formatSignedCents(-4990)).not.toContain('-');
+  });
+
+  it('receita usa "+" antes do R$', () => {
+    expect(formatSignedCents(4990)).toBe(`+R$${NBSP}49,90`);
+  });
+
+  it('valores grandes (R$ 1.000.000,00 e o máximo de 11 dígitos)', () => {
+    expect(formatSignedCents(100000000)).toBe(`+R$${NBSP}1.000.000,00`);
+    expect(formatSignedCents(-100000000)).toBe(`${MINUS}R$${NBSP}1.000.000,00`);
+    expect(formatSignedCents(99999999999)).toBe(`+R$${NBSP}999.999.999,99`);
+  });
+
+  it('mantém o espaço especial do Intl entre o R$ e o número', () => {
+    expect(formatSignedCents(100)).toContain(NBSP);
+    expect(formatSignedCents(-100)).toContain(NBSP);
+    expect(formatSignedCents(100)).not.toContain(' ');
+  });
+
+  it('rejeita valor com decimal, NaN e infinito (como formatCents)', () => {
+    expect(() => formatSignedCents(1.5)).toThrow(RangeError);
+    expect(() => formatSignedCents(-1.5)).toThrow(RangeError);
+    expect(() => formatSignedCents(Number.NaN)).toThrow(RangeError);
+    expect(() => formatSignedCents(Number.POSITIVE_INFINITY)).toThrow(RangeError);
   });
 });
