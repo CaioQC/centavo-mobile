@@ -47,3 +47,9 @@ export function formatInstallment(number: number | null, total: number | null): 
   if (number === null || total === null) return null;
   return `${number}/${total}`;
 }
+
+/** Data por extenso para o detalhe: "2026-11-14" → "14 de novembro de 2026". */
+export function formatFullDate(date: LocalDate): string {
+  const { year, month, day } = parts(date);
+  return `${day} de ${MONTH_NAMES[month - 1]} de ${year}`;
+}
