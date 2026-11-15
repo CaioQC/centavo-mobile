@@ -66,3 +66,8 @@ export function useDbQuery<T>(query: Query<T>): QueryState<T> & { reload: () => 
   const status = stored.source === query ? stored.status : 'loading';
   return { status, data, reload } as QueryState<T> & { reload: () => void };
 }
+
+/** O banco do aparelho, para a tela chamar os repositórios ao gravar (a tela não escreve SQL). */
+export function useDatabase(): Database {
+  return useSQLiteContext();
+}

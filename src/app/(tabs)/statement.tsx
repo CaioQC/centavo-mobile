@@ -146,7 +146,7 @@ export default function StatementScreen() {
             </AppText>
           </View>
         )}
-        renderItem={({ item }) => <TransactionRow transaction={item} category={item.categoryId ? categoriesById.get(item.categoryId) : undefined} />}
+        renderItem={({ item }) => <TransactionRow transaction={item} category={item.categoryId ? categoriesById.get(item.categoryId) : undefined} onPress={() => router.push(`/transaction/${item.id}`)} />}
       />
     </Screen>
   );

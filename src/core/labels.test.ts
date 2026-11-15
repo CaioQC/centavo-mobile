@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDayLabel, formatInstallment, formatMonthLabel } from './labels';
+import { formatDayLabel, formatFullDate, formatInstallment, formatMonthLabel } from './labels';
 
 describe('formatMonthLabel', () => {
   it('escreve o mês por extenso com inicial maiúscula', () => {
@@ -153,5 +153,22 @@ describe('formatInstallment', () => {
 
   it('1x aparece como "1/1"', () => {
     expect(formatInstallment(1, 1)).toBe('1/1');
+  });
+});
+
+describe('formatFullDate', () => {
+  it('escreve dia, mês por extenso e ano', () => {
+    expect(formatFullDate('2026-11-14')).toBe('14 de novembro de 2026');
+    expect(formatFullDate('2026-03-01')).toBe('1 de março de 2026');
+  });
+
+  it('aceita 29/02 de ano bissexto e o último dia do ano', () => {
+    expect(formatFullDate('2028-02-29')).toBe('29 de fevereiro de 2028');
+    expect(formatFullDate('2026-12-31')).toBe('31 de dezembro de 2026');
+  });
+
+  it('lança RangeError para data inválida', () => {
+    expect(() => formatFullDate('2026-02-29')).toThrow(RangeError);
+    expect(() => formatFullDate('14/11/2026')).toThrow(RangeError);
   });
 });
