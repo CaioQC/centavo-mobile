@@ -89,3 +89,16 @@ export function monthRange(month: YearMonth): { start: LocalDate; endExclusive: 
   if (!isValidYearMonth(month)) throw new RangeError(`Mês inválido: ${month}`);
   return { start: `${month}-01`, endExclusive: `${addMonths(month, 1)}-01` };
 }
+
+/**
+ * Soma meses a um dia mantendo o dia do mês, limitado ao último dia do mês de destino:
+ * ("2026-01-31", 1) → "2026-02-28". Usado na data de cada parcela (ADR 11).
+ */
+export function addMonthsToDate(date: LocalDate, months: number): LocalDate {
+  if (!isValidLocalDate(date)) throw new RangeError(`Data inválida: ${date}`);
+  const target = addMonths(monthOf(date), months);
+  const [year, month] = target.split('-').map(Number) as [number, number];
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const day = Math.min(Number(date.slice(8, 10)), lastDay);
+  return `${target}-${String(day).padStart(2, '0')}`;
+}

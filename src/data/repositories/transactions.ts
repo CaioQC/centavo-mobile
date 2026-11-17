@@ -1,4 +1,5 @@
 import { monthRange, type YearMonth } from '../../core/dates';
+import { buildManualTransactions, type NewTransactionForm } from '../../core/newTransaction';
 import { newId } from '../ids';
 import type { Database, SqlValue } from '../database';
 import type { NewTransaction, Transaction } from '../types';
@@ -128,4 +129,32 @@ export async function deleteManualTransaction(db: Database, id: string): Promise
     ? await db.runAsync('DELETE FROM transactions WHERE installment_group_id = ?', [row.installmentGroupId])
     : await db.runAsync('DELETE FROM transactions WHERE id = ?', [id]);
   return result.changes;
+}
+
+/**
+ * Grava um lançamento manual. Compra parcelada grava as N parcelas de uma vez (tudo ou nada),
+ * ligadas por `installment_group_id`, cada uma com a sua data e o seu `budget_month` (ADR 11).
+ * A categoria vem da escolha do usuário, então entra como `MANUAL`. Devolve os IDs, na ordem das parcelas.
+ * Lança `RangeError` se o formulário for inválido (a tela valida antes).
+ */
+export async function createManualTransactions(db: Database, form: NewTransactionForm): Promise<string[]> {
+  const drafts = buildManualTransactions(form);
+  const groupId = drafts.length > 1 ? newId() : null;
+  return insertTransactions(
+    db,
+    drafts.map((draft) => ({
+      accountId: form.accountId as string,
+      source: 'MANUAL' as const,
+      externalId: null,
+      description: draft.description,
+      amountInCents: draft.amountInCents,
+      date: draft.date,
+      budgetMonth: draft.budgetMonth,
+      categoryId: form.categoryId,
+      categorySource: 'MANUAL' as const,
+      installmentGroupId: groupId,
+      installmentNumber: draft.installmentNumber,
+      totalInstallments: draft.totalInstallments,
+    })),
+  );
 }

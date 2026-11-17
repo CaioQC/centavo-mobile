@@ -1,6 +1,6 @@
 # Centavo Mobile
 
-App mobile (Expo + React Native + TypeScript) de finanças pessoais, **versão reduzida do Centavo** feita para a atividade AT2-N2 da disciplina de Programação de App (UCB). Avaliado por um vídeo de ~30 s e uma apresentação em sala; prazo de 1 a 2 semanas a partir de 14/11/2026. **Estado atual: etapa 0 (fundação) pronta: projeto Expo com as quatro abas, tema, SQLite com a migração 1 e `src/core` com centavos e datas; as telas ainda são vazias.**
+App mobile (Expo + React Native + TypeScript) de finanças pessoais, **versão reduzida do Centavo** feita para a atividade AT2-N2 da disciplina de Programação de App (UCB). Avaliado por um vídeo de ~30 s e uma apresentação em sala; prazo de 1 a 2 semanas a partir de 14/11/2026. **Estado atual: etapas 0 (fundação) e 1 (dados e extrato) prontas: dados de exemplo, extrato com filtros e busca, detalhe com recategorização e observação e novo lançamento com parcelas; as abas Início, Orçamento e Metas ainda são vazias.**
 
 Este repositório nasceu da `main` do [Centavo](https://github.com/CaioQC/Centavo) (remote `upstream`), que é Backend + Web com a Pluggy. O vault em `docs/` veio junto: **o que vale para o app está em `docs/mobile/`**; o resto descreve o Centavo completo e serve de referência para as regras de negócio. Comece por [docs/mobile/escopo.md](docs/mobile/escopo.md); o índice geral é [docs/inicio.md](docs/inicio.md).
 

@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { createTestDatabase } from '../testing/createTestDatabase';
 import type { NewTransaction } from '../types';
+import type { NewTransactionForm } from '../../core/newTransaction';
 import {
+  createManualTransactions,
   deleteManualTransaction,
   getTransaction,
   insertAccount,
@@ -155,5 +157,65 @@ describe('transações', () => {
       TransactionNotDeletableError,
     );
     expect(await deleteManualTransaction(db, 'nao-existe')).toBe(0);
+  });
+});
+
+describe('lançamento manual', () => {
+  const form = (accountId: string, over: Partial<NewTransactionForm> = {}): NewTransactionForm => ({
+    kind: 'EXPENSE',
+    amountInCents: 30000,
+    description: '  Geladeira  ',
+    accountId,
+    accountIsCreditCard: true,
+    categoryId: 'shopping',
+    date: '2026-11-30',
+    installments: 3,
+    ...over,
+  });
+
+  it('compra em 3x grava as 3 parcelas de uma vez, cada uma no seu mês, e a soma fecha', async () => {
+    const { db, accountId } = await setup();
+    const ids = await createManualTransactions(db, form(accountId, { amountInCents: 10000 }));
+    expect(ids).toHaveLength(3);
+    const rows = [
+      ...(await listTransactionsByMonth(db, '2026-11')),
+      ...(await listTransactionsByMonth(db, '2026-12')),
+      ...(await listTransactionsByMonth(db, '2027-01')),
+    ].sort((a, b) => (a.installmentNumber ?? 0) - (b.installmentNumber ?? 0));
+    expect(rows.map((t) => [t.installmentNumber, t.totalInstallments, t.date, t.budgetMonth, t.amountInCents])).toEqual([
+      [1, 3, '2026-11-30', '2026-11', -3334],
+      [2, 3, '2026-12-30', '2026-12', -3333],
+      [3, 3, '2027-01-30', '2027-01', -3333],
+    ]);
+    expect(rows.reduce((sum, t) => sum + t.amountInCents, 0)).toBe(-10000);
+    expect(new Set(rows.map((t) => t.installmentGroupId)).size).toBe(1);
+    expect(rows[0]).toMatchObject({ description: 'Geladeira', source: 'MANUAL', categorySource: 'MANUAL', externalId: null });
+  });
+
+  it('à vista e receita viram uma transação só, sem grupo nem parcela', async () => {
+    const { db, accountId } = await setup();
+    await createManualTransactions(db, form(accountId, { installments: 1 }));
+    await createManualTransactions(
+      db,
+      form(accountId, { kind: 'INCOME', categoryId: 'salary', installments: 1, description: 'Bônus' }),
+    );
+    const list = (await listTransactionsByMonth(db, '2026-11')).sort((a, b) => a.description.localeCompare(b.description));
+    expect(list.map((t) => [t.description, t.amountInCents, t.installmentGroupId, t.installmentNumber])).toEqual([
+      ['Bônus', 30000, null, null],
+      ['Geladeira', -30000, null, null],
+    ]);
+  });
+
+  it('excluir uma parcela leva a compra inteira', async () => {
+    const { db, accountId } = await setup();
+    const ids = await createManualTransactions(db, form(accountId));
+    expect(await deleteManualTransaction(db, ids[1] as string)).toBe(3);
+    expect(await listTransactionsByMonth(db, '2026-11')).toEqual([]);
+  });
+
+  it('formulário inválido não grava nada', async () => {
+    const { db, accountId } = await setup();
+    await expect(createManualTransactions(db, form(accountId, { amountInCents: 0 }))).rejects.toThrow(RangeError);
+    expect(await listTransactionsByMonth(db, '2026-11')).toEqual([]);
   });
 });

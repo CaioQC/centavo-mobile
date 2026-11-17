@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addMonths,
+  addMonthsToDate,
   budgetMonth,
   currentMonth,
   isValidLocalDate,
@@ -170,5 +171,44 @@ describe('monthRange', () => {
   it('lança para mês inválido', () => {
     expect(() => monthRange('2026-13')).toThrow(RangeError);
     expect(() => monthRange('2026-11-01')).toThrow(RangeError);
+  });
+});
+
+describe('addMonthsToDate', () => {
+  it('mantém o dia quando o mês de destino o tem', () => {
+    expect(addMonthsToDate('2026-11-30', 1)).toBe('2026-12-30');
+    expect(addMonthsToDate('2026-11-15', 0)).toBe('2026-11-15');
+  });
+
+  it('limita ao último dia do mês de destino: 31/01 + 1 mês = 28/02', () => {
+    expect(addMonthsToDate('2026-01-31', 1)).toBe('2026-02-28');
+    expect(addMonthsToDate('2026-01-31', 3)).toBe('2026-04-30');
+    expect(addMonthsToDate('2026-03-31', -1)).toBe('2026-02-28');
+  });
+
+  it('em ano bissexto fevereiro vai a 29', () => {
+    expect(addMonthsToDate('2028-01-31', 1)).toBe('2028-02-29');
+    expect(addMonthsToDate('2028-01-30', 1)).toBe('2028-02-29');
+    expect(addMonthsToDate('2028-01-29', 1)).toBe('2028-02-29');
+  });
+
+  it('29/02 de ano bissexto: cai em 28/02 no ano comum e volta a 29/02 no próximo bissexto', () => {
+    expect(addMonthsToDate('2028-02-29', 12)).toBe('2029-02-28');
+    expect(addMonthsToDate('2028-02-29', 48)).toBe('2032-02-29');
+    expect(addMonthsToDate('2028-02-29', 1)).toBe('2028-03-29');
+  });
+
+  it('vira o ano para a frente e para trás', () => {
+    expect(addMonthsToDate('2026-11-30', 2)).toBe('2027-01-30');
+    expect(addMonthsToDate('2026-12-31', 1)).toBe('2027-01-31');
+    expect(addMonthsToDate('2026-01-15', -1)).toBe('2025-12-15');
+    expect(addMonthsToDate('2026-01-31', 25)).toBe('2028-02-29');
+  });
+
+  it('lança para data inválida e para quantidade de meses não inteira', () => {
+    expect(() => addMonthsToDate('2026-02-29', 1)).toThrow(RangeError);
+    expect(() => addMonthsToDate('lixo', 1)).toThrow(RangeError);
+    expect(() => addMonthsToDate('2026-01-31', 1.5)).toThrow(RangeError);
+    expect(() => addMonthsToDate('2026-01-31', Number.NaN)).toThrow(RangeError);
   });
 });
