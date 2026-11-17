@@ -12,6 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 
 import { DatabaseProvider } from '@/data/DatabaseProvider';
+import { ThemePreferenceProvider } from '@/features/settings/ThemePreferenceProvider';
 import { useTheme } from '@/shared/theme';
 
 // Mantém a splash até as fontes e o banco estarem prontos.
@@ -24,6 +25,23 @@ function HideSplashWhenMounted() {
   return null;
 }
 
+function AppShell() {
+  const { colors, scheme } = useTheme();
+  return (
+    <>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="new-transaction" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="accounts" />
+        <Stack.Screen name="new-account" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="settings" />
+      </Stack>
+      <HideSplashWhenMounted />
+    </>
+  );
+}
+
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     PlusJakartaSans_400Regular,
@@ -32,20 +50,14 @@ export default function RootLayout() {
     PlusJakartaSans_700Bold,
     PlusJakartaSans_800ExtraBold,
   });
-  const { colors } = useTheme();
 
   if (!fontsLoaded && !fontError) return null;
 
   return (
     <DatabaseProvider>
-      <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="new-transaction" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="accounts" />
-        <Stack.Screen name="new-account" options={{ presentation: 'modal' }} />
-      </Stack>
-      <HideSplashWhenMounted />
+      <ThemePreferenceProvider>
+        <AppShell />
+      </ThemePreferenceProvider>
     </DatabaseProvider>
   );
 }
