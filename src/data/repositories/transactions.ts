@@ -1,4 +1,4 @@
-import { monthRange, type YearMonth } from '../../core/dates';
+import { monthRange, type LocalDate, type YearMonth } from '../../core/dates';
 import { buildManualTransactions, type NewTransactionForm } from '../../core/newTransaction';
 import { newId } from '../ids';
 import type { Database, SqlValue } from '../database';
@@ -28,6 +28,14 @@ export function listTransactionsByMonth(db: Database, month: YearMonth): Promise
   return db.getAllAsync<Transaction>(
     `${SELECT} WHERE t.date >= ? AND t.date < ? ORDER BY t.date DESC, t.created_at DESC, t.id`,
     [start, endExclusive],
+  );
+}
+
+/** As últimas transações até `today` (parcelas de datas futuras ainda não aconteceram), as mais recentes primeiro. */
+export function listRecentTransactions(db: Database, today: LocalDate, limit: number): Promise<Transaction[]> {
+  return db.getAllAsync<Transaction>(
+    `${SELECT} WHERE t.date <= ? ORDER BY t.date DESC, t.created_at DESC, t.id LIMIT ?`,
+    [today, limit],
   );
 }
 
