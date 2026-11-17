@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { router } from 'expo-router';
-import { RotateCcw } from 'lucide-react-native';
+import { Fingerprint, RotateCcw } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { importSampleData } from '@/data/sample/import';
 import { useDatabase } from '@/data/useDbQuery';
+import { useBiometricLock } from '@/features/lock/BiometricLockProvider';
 import { ThemeSwitch } from '@/features/settings/ThemeSwitch';
 import { AppText, Screen } from '@/shared/components';
 import { MIN_TOUCH_SIZE, radius, spacing, useTheme, useThemePreference } from '@/shared/theme';
@@ -15,6 +16,8 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const db = useDatabase();
   const { preference, setPreference } = useThemePreference();
+  const lock = useBiometricLock();
+  const [lockError, setLockError] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState<{ text: string; failed: boolean } | null>(null);
 
@@ -34,6 +37,18 @@ export default function SettingsScreen() {
     }
   };
 
+  const toggleLock = async (next: boolean) => {
+    setLockError(null);
+    const done = await lock.setEnabled(next);
+    if (!done) {
+      setLockError(
+        next
+          ? 'Não foi possível ligar o desbloqueio. Confirme sua identidade ou cadastre biometria ou PIN no aparelho.'
+          : 'Não foi possível desligar o desbloqueio. Tente de novo.',
+      );
+    }
+  };
+
   const confirmRestore = () =>
     Alert.alert(
       'Restaurar dados de exemplo?',
@@ -47,6 +62,35 @@ export default function SettingsScreen() {
   return (
     <Screen title="Ajustes" onBack={() => router.back()}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}>
+        <View style={styles.section}>
+          <AppText variant="heading" accessibilityRole="header">
+            Segurança
+          </AppText>
+          <View style={[styles.row, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+            <Fingerprint size={20} color={colors.muted} strokeWidth={1.75} />
+            <View style={styles.rowText}>
+              <AppText variant="bodyStrong">Desbloqueio por biometria</AppText>
+              <AppText variant="caption" tone="muted">
+                {lock.available
+                  ? 'Pede digital, rosto ou PIN ao abrir o app.'
+                  : 'Cadastre uma biometria ou um PIN no aparelho para usar.'}
+              </AppText>
+            </View>
+            <Switch
+              accessibilityLabel="Desbloqueio por biometria"
+              value={lock.enabled && lock.available}
+              disabled={!lock.available && !lock.enabled}
+              onValueChange={toggleLock}
+              trackColor={{ true: colors.accent, false: colors.track }}
+            />
+          </View>
+          {lockError ? (
+            <AppText variant="caption" style={{ color: colors.over }} accessibilityLiveRegion="polite">
+              {lockError}
+            </AppText>
+          ) : null}
+        </View>
+
         <View style={styles.section}>
           <AppText variant="heading" accessibilityRole="header">
             Tema
@@ -91,6 +135,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.xl },
   section: { gap: spacing.md },
+  rowText: { flex: 1 },
   row: {
     minHeight: MIN_TOUCH_SIZE + spacing.lg,
     flexDirection: 'row',

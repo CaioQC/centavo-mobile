@@ -8,6 +8,12 @@
     "userInterfaceStyle": "automatic",
     "ios": { "supportsTablet": false },
     "android": { "package": "br.com.caioqc.centavo" },
-    "plugins": ["expo-router", "expo-sqlite", "expo-font", "expo-splash-screen"]
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-font",
+      "expo-splash-screen",
+      ["expo-local-authentication", { "faceIDPermission": "O Centavo usa o Face ID para abrir o app." }]
+    ]
   }
 }
