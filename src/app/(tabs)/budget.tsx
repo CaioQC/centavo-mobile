@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
 import { Clock, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -121,7 +122,7 @@ export default function BudgetScreen() {
             </>
           ) : (
             <AppText variant="caption" tone="muted">
-              Nenhum limite definido neste mês.
+              Nenhum limite definido neste mês. Toque numa categoria para definir.
             </AppText>
           )}
           {budget.committedInCents > 0 ? (
@@ -135,7 +136,12 @@ export default function BudgetScreen() {
         </View>
 
         {data.categories.map((category, index) => (
-          <BudgetRow key={category.id} category={category} line={budget.lines[index]!} />
+          <BudgetRow
+            key={category.id}
+            category={category}
+            line={budget.lines[index]!}
+            onPress={() => router.push({ pathname: '/edit-limit', params: { month, categoryId: category.id } })}
+          />
         ))}
       </ScrollView>
     </Screen>
