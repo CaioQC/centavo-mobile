@@ -5,17 +5,19 @@ import { House, Landmark, Settings, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { totalBalance } from '@/core/accounts';
+import { buildMonthBudget, settledTransactions } from '@/core/budget';
 import { currentMonth, todayLocal } from '@/core/dates';
 import { formatMonthLabel } from '@/core/labels';
 import { formatCents } from '@/core/money';
-import { budgetUsage, topSpendingCategories, totalSpending } from '@/core/spending';
+import { topSpendingCategories } from '@/core/spending';
 import type { Database } from '@/data/database';
 import {
-  getTotalBudgetInCents,
+  copyPreviousMonthLimitsIfNew,
   listAccountsWithBalance,
+  listBudgetLimits,
   listCategories,
   listRecentTransactions,
-  listTransactionsByMonth,
+  listTransactionsByBudgetMonth,
 } from '@/data/repositories';
 import { useDbQuery } from '@/data/useDbQuery';
 import { ShortcutRow } from '@/features/home/ShortcutRow';
@@ -29,14 +31,16 @@ const TOP_CATEGORIES = 3;
 
 async function loadHome(db: Database) {
   const month = currentMonth();
-  const [accounts, categories, monthTransactions, recent, budgetInCents] = await Promise.all([
+  // Mês novo: os limites do mês anterior já valem aqui, sem esperar o usuário abrir o Orçamento.
+  await copyPreviousMonthLimitsIfNew(db, month);
+  const [accounts, categories, monthTransactions, recent, limits] = await Promise.all([
     listAccountsWithBalance(db),
     listCategories(db),
-    listTransactionsByMonth(db, month),
+    listTransactionsByBudgetMonth(db, month),
     listRecentTransactions(db, todayLocal(), RECENT_COUNT),
-    getTotalBudgetInCents(db, month),
+    listBudgetLimits(db, month),
   ]);
-  return { month, accounts, categories, monthTransactions, recent, budgetInCents };
+  return { month, accounts, categories, monthTransactions, recent, limits };
 }
 
 export default function HomeScreen() {
@@ -49,13 +53,16 @@ export default function HomeScreen() {
 
   const summary = useMemo(() => {
     if (!data) return null;
-    const expenseIds = new Set(data.categories.filter((category) => category.kind === 'EXPENSE').map((c) => c.id));
-    const spentInCents = totalSpending(data.monthTransactions, expenseIds);
+    const today = todayLocal();
+    const expenseIds = data.categories.filter((category) => category.kind === 'EXPENSE').map((c) => c.id);
+    // Mesmas regras da tela Orçamento: gasto por budget_month, sem o que ainda é só "já comprometido".
+    const budget = buildMonthBudget(expenseIds, data.limits, data.monthTransactions, today);
     return {
       balanceInCents: totalBalance(data.accounts),
-      spentInCents,
-      usage: budgetUsage(spentInCents, data.budgetInCents),
-      top: topSpendingCategories(data.monthTransactions, expenseIds, TOP_CATEGORIES),
+      spentInCents: budget.spentInCents,
+      budgetInCents: budget.totalLimitInCents,
+      usage: budget.usage,
+      top: topSpendingCategories(settledTransactions(data.monthTransactions, today), new Set(expenseIds), TOP_CATEGORIES),
       categoriesById: new Map(data.categories.map((category) => [category.id, category])),
     };
   }, [data]);
@@ -163,7 +170,7 @@ export default function HomeScreen() {
             ) : (
               <>
                 <AppText variant="captionMoney" tone="muted">
-                  de {formatCents(data.budgetInCents)} de orçamento
+                  de {formatCents(summary.budgetInCents)} de orçamento
                 </AppText>
                 <AppText variant="caption" style={{ color: statusColor }}>
                   {statusText}

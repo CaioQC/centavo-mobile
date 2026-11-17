@@ -16,7 +16,6 @@ import {
   listRecentTransactions,
   listTransactionsByMonth,
   copyPreviousMonthLimitsIfNew,
-  getTotalBudgetInCents,
   listBudgetLimits,
   listTransactionsByBudgetMonth,
   setBudgetLimit,
@@ -78,19 +77,6 @@ describe('início', () => {
     ]);
     const list = await listRecentTransactions(db, '2026-11-12', 2);
     expect(list.map((t) => t.description)).toEqual(['C', 'B']);
-  });
-
-  it('orçamento total do mês soma os limites; sem limites vale zero', async () => {
-    const { db, sqlite } = await setup();
-    expect(await getTotalBudgetInCents(db, '2026-11')).toBe(0);
-    for (const [id, month, category, limit] of [
-      ['b1', '2026-11', 'food', 80_000],
-      ['b2', '2026-11', 'housing', 120_000],
-      ['b3', '2026-12', 'food', 50_000],
-    ] as const) {
-      sqlite.prepare('INSERT INTO budgets (id, month, category_id, limit_in_cents) VALUES (?, ?, ?, ?)').run(id, month, category, limit);
-    }
-    expect(await getTotalBudgetInCents(db, '2026-11')).toBe(200_000);
   });
 
 });
