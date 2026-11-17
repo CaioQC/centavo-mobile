@@ -4,6 +4,12 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-16: Orçamento do app: gasto por `budget_month`, "já comprometido" = parcela ainda não vencida
+- **Decisão:** o orçamento do mês soma as transações com `budget_month` igual ao mês (não o `date`). **Gasto** = despesas já ocorridas, com estornos de categoria de despesa abatidos (nunca abaixo de zero por categoria). **Já comprometido** = parcelas a partir da 2ª (`installment_number` > 1) com `date` depois de hoje: dinheiro já devido que ainda não saiu; quando a data chega, a parcela vira gasto. Como o app grava as N parcelas na hora, isso mostra, no exemplo da demo, R$ 100 de gasto no mês da compra e R$ 100 "já comprometido" em cada mês seguinte. O Início usa as mesmas regras. Os limites do mês anterior são copiados ao abrir um mês novo, uma vez por mês (chave `budget_limits_copied:YYYY-MM` em `settings`); limite removido não volta, e mês anterior sem limites não marca a cópia.
+- **Motivo:** o orçamento é por mês de competência ([ADR 11](../adr/adr-11-orcamento-cartao-parcelado.md)); o extrato, por `date` (decisão de 2026-11-14). Separar "gasto" de "já comprometido" evita que a compra parcelada pese inteira no mês da compra e deixa o mês seguinte mostrar o que já está devido.
+- **Alternativas descartadas:** gasto por `date` no orçamento (mistura competência com o dia do lançamento); contar a parcela futura já como gasto (estoura o limite do mês seguinte antes da hora); botão "copiar do mês anterior" em vez de cópia automática (o roteiro da demo abre o mês seguinte já com os limites).
+- **Afeta:** [orçamento do mês](../fluxos/orcamento-do-mes.md), [modelo de dados do app](../mobile/modelo-de-dados.md), [telas e demo](../mobile/telas-e-demo.md)
+
 ### 2026-11-14: Parcelas do app têm data própria, e o extrato filtra por `date`
 - **Decisão:** a parcela k de uma compra tem `date` = data da compra + (k − 1) meses (dia limitado ao fim do mês: 31/01 → 28/02) e `budget_month` = mês dessa data (igual ao mês da compra + (k − 1) da [ADR 11](../adr/adr-11-orcamento-cartao-parcelado.md)). O extrato do mês lista as transações cujo `date` cai no mês, então a parcela 2/3 aparece no extrato do mês seguinte, com data futura. Vale para as parcelas lançadas no app e para as do banco fictício (que "lança todas de uma vez").
 - **Motivo:** é o caso "banco que lança todas as parcelas de uma vez, com datas futuras" da ADR 11; mantém `date` e `budget_month` coerentes e deixa o extrato igual à fatura de cartão real.

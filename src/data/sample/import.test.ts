@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { listAccounts, listTransactionsByMonth, updateTransactionCategory, updateTransactionNote } from '../repositories';
+import { listAccounts, listBudgetLimits, setBudgetLimit, listTransactionsByMonth, updateTransactionCategory, updateTransactionNote } from '../repositories';
 import { createTestDatabase } from '../testing/createTestDatabase';
 import { generateSampleTransactions } from './generate';
 import { importSampleData, seedSampleDataIfNeeded } from './import';
@@ -24,6 +24,18 @@ describe('importSampleData', () => {
       ['Conta Corrente', 'Banco Jabuticaba', 'SIMULATED'],
     ]);
     expect(count(sqlite, 'transactions')).toBe(summary.transactions);
+  });
+
+  it('traz limites no mês corrente e restaurar não sobrescreve o que o usuário mudou', async () => {
+    const { db } = await createTestDatabase();
+    await importSampleData(db, TODAY);
+    const limits = await listBudgetLimits(db, '2026-11');
+    expect(limits.length).toBeGreaterThan(0);
+    expect(limits.find((l) => l.categoryId === 'food')?.limitInCents).toBeGreaterThan(0);
+    await setBudgetLimit(db, '2026-11', 'food', 12_345);
+    await importSampleData(db, TODAY);
+    expect((await listBudgetLimits(db, '2026-11')).find((l) => l.categoryId === 'food')?.limitInCents).toBe(12_345);
+    expect(await listBudgetLimits(db, '2026-10')).toEqual([]);
   });
 
   it('importar de novo não duplica nada', async () => {

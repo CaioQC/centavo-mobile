@@ -31,6 +31,14 @@ export function listTransactionsByMonth(db: Database, month: YearMonth): Promise
   );
 }
 
+/** Transações do orçamento do mês (`budget_month`, ADR 11), as mais recentes primeiro. */
+export function listTransactionsByBudgetMonth(db: Database, month: YearMonth): Promise<Transaction[]> {
+  return db.getAllAsync<Transaction>(
+    `${SELECT} WHERE t.budget_month = ? ORDER BY t.date DESC, t.created_at DESC, t.id`,
+    [month],
+  );
+}
+
 /** As últimas transações até `today` (parcelas de datas futuras ainda não aconteceram), as mais recentes primeiro. */
 export function listRecentTransactions(db: Database, today: LocalDate, limit: number): Promise<Transaction[]> {
   return db.getAllAsync<Transaction>(

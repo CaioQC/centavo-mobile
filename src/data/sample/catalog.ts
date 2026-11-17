@@ -32,3 +32,15 @@ export const SAMPLE_ACCOUNTS: SampleAccount[] = [
     creditLimitInCents: 600000,
   },
 ];
+
+/** Limites do orçamento do mês corrente nos dados de exemplo, por categoria de despesa (centavos). */
+export const SAMPLE_BUDGET_LIMITS: Record<string, number> = {
+  housing: 220000,
+  food: 100000,
+  transport: 60000,
+  health: 20000,
+  leisure: 15000,
+  subscriptions: 8000,
+  shopping: 25000,
+  education: 15000,
+};
