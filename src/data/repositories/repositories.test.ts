@@ -4,12 +4,14 @@ import { createTestDatabase } from '../testing/createTestDatabase';
 import type { NewTransaction } from '../types';
 import type { NewTransactionForm } from '../../core/newTransaction';
 import {
+  createManualAccount,
   createManualTransactions,
   deleteManualTransaction,
   getTransaction,
   insertAccount,
   insertTransactions,
   listAccounts,
+  listAccountsWithBalance,
   listCategories,
   listTransactionsByMonth,
   TransactionNotDeletableError,
@@ -19,7 +21,7 @@ import {
 } from './index';
 
 async function setup() {
-  const { db } = await createTestDatabase();
+  const { db, sqlite } = await createTestDatabase();
   const accountId = await insertAccount(db, {
     connectionId: null,
     source: 'MANUAL',
@@ -41,7 +43,7 @@ async function setup() {
     categorySource: 'IMPORT',
     ...over,
   });
-  return { db, accountId, base };
+  return { db, sqlite, accountId, base };
 }
 
 describe('categorias e contas', () => {
@@ -56,6 +58,41 @@ describe('categorias e contas', () => {
     const accounts = await listAccounts(db);
     expect(accounts).toHaveLength(1);
     expect(accounts[0]).toMatchObject({ name: 'Carteira', institutionName: null, type: 'CASH' });
+  });
+});
+
+describe('saldo e conta manual', () => {
+  it('saldo = saldo inicial + soma das transações, só da própria conta', async () => {
+    const { db, accountId, base } = await setup();
+    const other = await createManualAccount(db, { name: 'Poupança', type: 'BANK', initialBalanceInCents: 100_000 });
+    await insertTransactions(db, [
+      base({ amountInCents: -500 }),
+      base({ amountInCents: 2_000, categoryId: 'salary' }),
+      base({ accountId: other, amountInCents: -300 }),
+    ]);
+    const accounts = await listAccountsWithBalance(db);
+    expect(accounts.find((a) => a.id === accountId)?.balanceInCents).toBe(1_500);
+    expect(accounts.find((a) => a.id === other)?.balanceInCents).toBe(99_700);
+  });
+
+  it('conta sem transações tem o saldo inicial', async () => {
+    const { db } = await setup();
+    const id = await createManualAccount(db, { name: '  Cofre  ', type: 'CASH', initialBalanceInCents: 25_000 });
+    const account = (await listAccountsWithBalance(db)).find((a) => a.id === id);
+    expect(account).toMatchObject({
+      name: 'Cofre',
+      type: 'CASH',
+      source: 'MANUAL',
+      connectionId: null,
+      institutionName: null,
+      balanceInCents: 25_000,
+    });
+  });
+
+  it('recusa conta manual inválida sem gravar', async () => {
+    const { db } = await setup();
+    await expect(createManualAccount(db, { name: ' ', type: 'CASH', initialBalanceInCents: 0 })).rejects.toThrow(RangeError);
+    expect(await listAccounts(db)).toHaveLength(1);
   });
 });
 

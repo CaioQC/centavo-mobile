@@ -42,6 +42,8 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="new-transaction" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="accounts" />
+        <Stack.Screen name="new-account" options={{ presentation: 'modal' }} />
       </Stack>
       <HideSplashWhenMounted />
     </DatabaseProvider>

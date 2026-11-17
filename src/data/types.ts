@@ -30,6 +30,11 @@ export interface Account {
   institutionName: string | null;
 }
 
+/** Conta com o saldo já calculado (saldo inicial + soma das transações). */
+export interface AccountWithBalance extends Account {
+  balanceInCents: number;
+}
+
 export interface Connection {
   id: string;
   institutionKey: string;
