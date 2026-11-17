@@ -13,7 +13,9 @@ import {
   listAccounts,
   listAccountsWithBalance,
   listCategories,
+  listRecentTransactions,
   listTransactionsByMonth,
+  getTotalBudgetInCents,
   TransactionNotDeletableError,
   updateTransactionCategory,
   updateTransactionNote,
@@ -58,6 +60,33 @@ describe('categorias e contas', () => {
     const accounts = await listAccounts(db);
     expect(accounts).toHaveLength(1);
     expect(accounts[0]).toMatchObject({ name: 'Carteira', institutionName: null, type: 'CASH' });
+  });
+});
+
+describe('início', () => {
+  it('últimas transações: até hoje, mais recentes primeiro, com limite', async () => {
+    const { db, base } = await setup();
+    await insertTransactions(db, [
+      base({ date: '2026-11-01', description: 'A' }),
+      base({ date: '2026-11-10', description: 'B' }),
+      base({ date: '2026-11-12', description: 'C' }),
+      base({ date: '2026-12-01', budgetMonth: '2026-12', description: 'Futura' }),
+    ]);
+    const list = await listRecentTransactions(db, '2026-11-12', 2);
+    expect(list.map((t) => t.description)).toEqual(['C', 'B']);
+  });
+
+  it('orçamento total do mês soma os limites; sem limites vale zero', async () => {
+    const { db, sqlite } = await setup();
+    expect(await getTotalBudgetInCents(db, '2026-11')).toBe(0);
+    for (const [id, month, category, limit] of [
+      ['b1', '2026-11', 'food', 80_000],
+      ['b2', '2026-11', 'housing', 120_000],
+      ['b3', '2026-12', 'food', 50_000],
+    ] as const) {
+      sqlite.prepare('INSERT INTO budgets (id, month, category_id, limit_in_cents) VALUES (?, ?, ?, ?)').run(id, month, category, limit);
+    }
+    expect(await getTotalBudgetInCents(db, '2026-11')).toBe(200_000);
   });
 });
 
