@@ -26,7 +26,7 @@ export default function HomeScreen() {
         <ShortcutRow
           icon={Settings}
           title="Ajustes"
-          subtitle="Tema e dados de exemplo"
+          subtitle="Biometria, tema e dados de exemplo"
           onPress={() => router.push('/settings')}
         />
       </View>

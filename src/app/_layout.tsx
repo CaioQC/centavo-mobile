@@ -12,6 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 
 import { DatabaseProvider } from '@/data/DatabaseProvider';
+import { BiometricLockProvider } from '@/features/lock/BiometricLockProvider';
 import { ThemePreferenceProvider } from '@/features/settings/ThemePreferenceProvider';
 import { useTheme } from '@/shared/theme';
 
@@ -56,7 +57,9 @@ export default function RootLayout() {
   return (
     <DatabaseProvider>
       <ThemePreferenceProvider>
-        <AppShell />
+        <BiometricLockProvider>
+          <AppShell />
+        </BiometricLockProvider>
       </ThemePreferenceProvider>
     </DatabaseProvider>
   );
