@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { House, Landmark } from 'lucide-react-native';
+import { House, Landmark, Settings } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ShortcutRow } from '@/features/home/ShortcutRow';
@@ -22,6 +22,12 @@ export default function HomeScreen() {
           title="Contas e conexões"
           subtitle="Saldo de cada conta"
           onPress={() => router.push('/accounts')}
+        />
+        <ShortcutRow
+          icon={Settings}
+          title="Ajustes"
+          subtitle="Tema e dados de exemplo"
+          onPress={() => router.push('/settings')}
         />
       </View>
     </Screen>
