@@ -1,6 +1,7 @@
+import { accountBalance, validateNewManualAccount, type NewManualAccountForm } from '../../core/accounts';
 import { newId } from '../ids';
 import type { Database } from '../database';
-import type { Account, AccountType, Source } from '../types';
+import type { Account, AccountType, AccountWithBalance, Source } from '../types';
 
 const SELECT = `SELECT a.id, a.connection_id AS connectionId, a.source, a.external_id AS externalId, a.name, a.type,
     a.initial_balance_in_cents AS initialBalanceInCents, a.credit_limit_in_cents AS creditLimitInCents,
@@ -13,6 +14,23 @@ export function listAccounts(db: Database): Promise<Account[]> {
     `${SELECT} WHERE a.archived_at IS NULL ORDER BY (a.source = 'MANUAL'), a.name COLLATE NOCASE`,
     [],
   );
+}
+
+/** Contas não arquivadas com o saldo (saldo inicial + soma das transações), na mesma ordem de `listAccounts`. */
+export async function listAccountsWithBalance(db: Database): Promise<AccountWithBalance[]> {
+  const rows = await db.getAllAsync<Account & { transactionsSumInCents: number }>(
+    `SELECT a.id, a.connection_id AS connectionId, a.source, a.external_id AS externalId, a.name, a.type,
+      a.initial_balance_in_cents AS initialBalanceInCents, a.credit_limit_in_cents AS creditLimitInCents,
+      c.institution_name AS institutionName,
+      COALESCE((SELECT SUM(t.amount_in_cents) FROM transactions t WHERE t.account_id = a.id), 0) AS transactionsSumInCents
+    FROM accounts a LEFT JOIN connections c ON c.id = a.connection_id
+    WHERE a.archived_at IS NULL ORDER BY (a.source = 'MANUAL'), a.name COLLATE NOCASE`,
+    [],
+  );
+  return rows.map(({ transactionsSumInCents, ...account }) => ({
+    ...account,
+    balanceInCents: accountBalance(account.initialBalanceInCents, transactionsSumInCents),
+  }));
 }
 
 export function getAccount(db: Database, id: string): Promise<Account | null> {
@@ -57,4 +75,23 @@ export async function insertAccount(db: Database, data: NewAccount): Promise<str
     ],
   );
   return id;
+}
+
+/**
+ * Cria uma conta manual (dinheiro ou conta fora da conexão simulada) com o saldo inicial informado.
+ * Lança `RangeError` se o formulário for inválido (a tela valida antes). Devolve o ID.
+ */
+export async function createManualAccount(db: Database, form: NewManualAccountForm): Promise<string> {
+  if (Object.keys(validateNewManualAccount(form)).length > 0) {
+    throw new RangeError('Conta manual inválida.');
+  }
+  return insertAccount(db, {
+    connectionId: null,
+    source: 'MANUAL',
+    externalId: null,
+    name: form.name.trim(),
+    type: form.type,
+    initialBalanceInCents: form.initialBalanceInCents,
+    creditLimitInCents: null,
+  });
 }
