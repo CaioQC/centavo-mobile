@@ -50,6 +50,7 @@ export default function ConnectBankScreen() {
               key={bank.key}
               bank={bank}
               onConnect={() => router.push({ pathname: '/connect-bank-consent', params: { key: bank.key } })}
+              onSync={() => router.push({ pathname: '/connect-bank-sync', params: { key: bank.key } })}
             />
           ))}
         </View>
