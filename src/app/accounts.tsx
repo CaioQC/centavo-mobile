@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Landmark, Link2, Plus, TriangleAlert } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Landmark, Link2, Plus } from 'lucide-react-native';
 
 import { groupAccountsByBank } from '@/core/accounts';
 import { formatCents } from '@/core/money';
@@ -10,12 +9,10 @@ import type { Database } from '@/data/database';
 import { listAccountsWithBalance } from '@/data/repositories';
 import { useDbQuery } from '@/data/useDbQuery';
 import { AccountRow } from '@/features/accounts/AccountRow';
-import { AppText, Button, EmptyState, Screen } from '@/shared/components';
-import { spacing, useTheme } from '@/shared/theme';
+import { AppText, Button, EmptyState, QueryFallback, Screen, Section } from '@/shared/components';
+import { spacing } from '@/shared/theme';
 
 export default function AccountsScreen() {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const load = useCallback((db: Database) => listAccountsWithBalance(db), []);
   const result = useDbQuery(load);
   const goBack = () => router.back();
@@ -25,26 +22,16 @@ export default function AccountsScreen() {
   if (!result.data) {
     return (
       <Screen title="Contas e conexões" onBack={goBack}>
-        {result.status === 'error' ? (
-          <EmptyState
-            icon={TriangleAlert}
-            title="Não foi possível carregar as contas"
-            message="Algo deu errado ao ler os dados do aparelho. Tente de novo."
-            actionLabel="Tentar de novo"
-            onAction={result.reload}
-          />
-        ) : (
-          <ActivityIndicator accessibilityLabel="Carregando" color={colors.muted} />
-        )}
+        <QueryFallback status={result.status} errorTitle="Não foi possível carregar as contas" onRetry={result.reload} />
       </Screen>
     );
   }
 
   const groups = groupAccountsByBank(result.data);
 
-  return (
-    <Screen title="Contas e conexões" onBack={goBack}>
-      {groups.length === 0 ? (
+  if (groups.length === 0) {
+    return (
+      <Screen title="Contas e conexões" onBack={goBack}>
         <View style={styles.empty}>
           <EmptyState
             icon={Landmark}
@@ -55,37 +42,36 @@ export default function AccountsScreen() {
           />
           <Button label="Conectar banco" icon={Link2} onPress={connectBank} />
         </View>
-      ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}>
-          {groups.map((group) => (
-            <View key={group.title} style={styles.group}>
-              <View style={styles.groupHeader}>
-                <AppText variant="heading" accessibilityRole="header">
-                  {group.title}
-                </AppText>
-                <AppText variant="captionMoney" tone="muted">
-                  {formatCents(group.totalInCents)}
-                </AppText>
-              </View>
-              {group.accounts.map((account) => (
-                <AccountRow key={account.id} account={account} />
-              ))}
-            </View>
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen title="Contas e conexões" onBack={goBack} scroll gap={spacing.xl}>
+      {groups.map((group) => (
+        <Section
+          key={group.title}
+          title={group.title}
+          action={
+            <AppText variant="captionMoney" tone="muted">
+              {formatCents(group.totalInCents)}
+            </AppText>
+          }
+        >
+          {group.accounts.map((account) => (
+            <AccountRow key={account.id} account={account} />
           ))}
-          <View style={styles.actions}>
-            <Button label="Conectar banco" icon={Link2} onPress={connectBank} />
-            <Button label="Nova conta manual" icon={Plus} variant="tonal" onPress={newAccount} />
-          </View>
-        </ScrollView>
-      )}
+        </Section>
+      ))}
+      <View style={styles.actions}>
+        <Button label="Conectar banco" icon={Link2} onPress={connectBank} />
+        <Button label="Nova conta manual" icon={Plus} variant="tonal" onPress={newAccount} />
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl },
-  group: { gap: spacing.sm },
-  groupHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   empty: { gap: spacing.lg },
   actions: { gap: spacing.sm },
 });

@@ -1,19 +1,23 @@
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, Switch } from 'react-native';
 import { router } from 'expo-router';
 import { Fingerprint, RotateCcw } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { THEME_PREFERENCE_LABELS, THEME_PREFERENCES, type ThemePreference } from '@/core/themePreference';
 import { importSampleData } from '@/data/sample/import';
 import { useDatabase } from '@/data/useDbQuery';
 import { useBiometricLock } from '@/features/lock/BiometricLockProvider';
-import { ThemeSwitch } from '@/features/settings/ThemeSwitch';
-import { AppText, Button, Screen } from '@/shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme, useThemePreference } from '@/shared/theme';
+import { AppText, Button, ListRow, Screen, SegmentedControl, Section, type SegmentOption } from '@/shared/components';
+import { spacing, useTheme, useThemePreference } from '@/shared/theme';
+
+const THEME_OPTIONS: SegmentOption<ThemePreference>[] = THEME_PREFERENCES.map((preference) => ({
+  value: preference,
+  label: THEME_PREFERENCE_LABELS[preference],
+  accessibilityLabel: `Tema ${THEME_PREFERENCE_LABELS[preference]}`,
+}));
 
 export default function SettingsScreen() {
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const db = useDatabase();
   const { preference, setPreference } = useThemePreference();
   const lock = useBiometricLock();
@@ -60,22 +64,17 @@ export default function SettingsScreen() {
     );
 
   return (
-    <Screen title="Ajustes" onBack={() => router.back()}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}>
-        <View style={styles.section}>
-          <AppText variant="heading" accessibilityRole="header">
-            Segurança
-          </AppText>
-          <View style={[styles.row, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-            <Fingerprint size={20} color={colors.muted} strokeWidth={1.75} />
-            <View style={styles.rowText}>
-              <AppText variant="bodyStrong">Desbloqueio por biometria</AppText>
-              <AppText variant="caption" tone="muted">
-                {lock.available
-                  ? 'Pede digital, rosto ou PIN ao abrir o app.'
-                  : 'Cadastre uma biometria ou um PIN no aparelho para usar.'}
-              </AppText>
-            </View>
+    <Screen title="Ajustes" onBack={() => router.back()} scroll gap={spacing.xl}>
+      <Section title="Segurança" gap={spacing.md}>
+        <ListRow
+          icon={Fingerprint}
+          title="Desbloqueio por biometria"
+          subtitle={
+            lock.available
+              ? 'Pede digital, rosto ou PIN ao abrir o app.'
+              : 'Cadastre uma biometria ou um PIN no aparelho para usar.'
+          }
+          trailing={
             <Switch
               accessibilityLabel="Desbloqueio por biometria"
               value={lock.enabled && lock.available}
@@ -83,59 +82,31 @@ export default function SettingsScreen() {
               onValueChange={toggleLock}
               trackColor={{ true: colors.accent, false: colors.track }}
             />
-          </View>
-          {lockError ? (
-            <AppText variant="caption" style={{ color: colors.over }} accessibilityLiveRegion="polite">
-              {lockError}
-            </AppText>
-          ) : null}
-        </View>
-
-        <View style={styles.section}>
-          <AppText variant="heading" accessibilityRole="header">
-            Tema
+          }
+        />
+        {lockError ? (
+          <AppText variant="caption" tone="danger" accessibilityLiveRegion="polite">
+            {lockError}
           </AppText>
-          <ThemeSwitch value={preference} onChange={setPreference} />
-        </View>
+        ) : null}
+      </Section>
 
-        <View style={styles.section}>
-          <AppText variant="heading" accessibilityRole="header">
-            Dados de exemplo
+      <Section title="Tema" gap={spacing.md}>
+        <SegmentedControl options={THEME_OPTIONS} value={preference} onChange={setPreference} />
+      </Section>
+
+      <Section title="Dados de exemplo" gap={spacing.md}>
+        <Button label="Restaurar dados de exemplo" icon={RotateCcw} variant="tonal" loading={restoring} onPress={confirmRestore} />
+        {restoreMessage ? (
+          <AppText
+            variant="caption"
+            tone={restoreMessage.failed ? 'danger' : 'muted'}
+            accessibilityLiveRegion="polite"
+          >
+            {restoreMessage.text}
           </AppText>
-          <Button
-            label="Restaurar dados de exemplo"
-            icon={RotateCcw}
-            variant="tonal"
-            loading={restoring}
-            onPress={confirmRestore}
-          />
-          {restoreMessage ? (
-            <AppText
-              variant="caption"
-              tone={restoreMessage.failed ? 'text' : 'muted'}
-              accessibilityLiveRegion="polite"
-              style={restoreMessage.failed ? { color: colors.over } : undefined}
-            >
-              {restoreMessage.text}
-            </AppText>
-          ) : null}
-        </View>
-      </ScrollView>
+        ) : null}
+      </Section>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  content: { gap: spacing.xl },
-  section: { gap: spacing.md },
-  rowText: { flex: 1 },
-  row: {
-    minHeight: MIN_TOUCH_SIZE + spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: radius.card,
-    borderWidth: 1,
-  },
-});

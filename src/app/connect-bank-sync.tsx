@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, BackHandler, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { CircleCheck, Landmark, TriangleAlert } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { pluralize, syncSummaryText } from '@/core/connections';
 import { findBank } from '@/data/banks/catalog';
 import { importBank, type BankImportSummary } from '@/data/banks/import';
 import { useDatabase } from '@/data/useDbQuery';
-import { AppText, Button, EmptyState, Screen } from '@/shared/components';
-import { radius, spacing, useTheme } from '@/shared/theme';
+import { AppText, Button, Card, EmptyState, Screen } from '@/shared/components';
+import { spacing, useTheme } from '@/shared/theme';
 
 /** A importação local é instantânea; este tempo mínimo deixa a etapa "Sincronizando…" visível. */
 const MIN_SYNC_MS = 1500;
@@ -21,7 +20,6 @@ const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, 
 export default function ConnectBankSyncScreen() {
   const { key } = useLocalSearchParams<{ key: string }>();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const db = useDatabase();
   const bank = findBank(key);
@@ -107,40 +105,33 @@ export default function ConnectBankSyncScreen() {
   const summaryText = syncSummaryText(summary);
 
   return (
-    <Screen title="Resumo">
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}>
-        <View
-          accessible
-          accessibilityLiveRegion="polite"
-          accessibilityLabel={`${title}. ${summaryText}`}
-          style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
-        >
-          <CircleCheck size={32} color={colors.income} strokeWidth={1.75} />
-          <AppText variant="heading" accessibilityRole="header" style={styles.text}>
-            {title}
-          </AppText>
-          <AppText style={styles.text}>{summaryText}</AppText>
-        </View>
-
-        <View style={[styles.card, styles.stats, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-          <StatRow label="Contas" value={pluralize(summary.accounts, 'conta', 'contas')} extra={summary.newAccounts} />
-          <StatRow
-            label="Transações"
-            value={pluralize(summary.transactions, 'transação', 'transações')}
-            extra={summary.newTransactions}
-          />
-        </View>
-
-        <AppText variant="caption" tone="muted" style={styles.text}>
-          Simulação: bancos e valores são fictícios.
-          {summary.newConnection ? '' : ' Suas categorias e observações foram mantidas.'}
+    <Screen title="Resumo" scroll>
+      <Card accessibilityLabel={`${title}. ${summaryText}`} accessibilityLiveRegion="polite" style={styles.panel}>
+        <CircleCheck size={32} color={colors.income} strokeWidth={1.75} />
+        <AppText variant="heading" accessibilityRole="header" style={styles.text}>
+          {title}
         </AppText>
+        <AppText style={styles.text}>{summaryText}</AppText>
+      </Card>
 
-        <View style={styles.actions}>
-          <Button label="Ver extrato" onPress={openStatement} />
-          <Button label="Concluir" variant="tonal" onPress={backToAccounts} />
-        </View>
-      </ScrollView>
+      <Card style={[styles.panel, styles.stats]}>
+        <StatRow label="Contas" value={pluralize(summary.accounts, 'conta', 'contas')} extra={summary.newAccounts} />
+        <StatRow
+          label="Transações"
+          value={pluralize(summary.transactions, 'transação', 'transações')}
+          extra={summary.newTransactions}
+        />
+      </Card>
+
+      <AppText variant="caption" tone="muted" style={styles.text}>
+        Simulação: bancos e valores são fictícios.
+        {summary.newConnection ? '' : ' Suas categorias e observações foram mantidas.'}
+      </AppText>
+
+      <View style={styles.actions}>
+        <Button label="Ver extrato" onPress={openStatement} />
+        <Button label="Concluir" variant="tonal" onPress={backToAccounts} />
+      </View>
     </Screen>
   );
 }
@@ -162,10 +153,9 @@ function StatRow({ label, value, extra }: { label: string; value: string; extra:
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md, paddingBottom: spacing.xxl },
   text: { textAlign: 'center' },
-  card: { alignItems: 'center', gap: spacing.sm, padding: spacing.lg, borderRadius: radius.card, borderWidth: 1 },
+  panel: { alignItems: 'center', gap: spacing.sm, padding: spacing.lg },
   stats: { alignItems: 'stretch', gap: spacing.md },
   statRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   statValues: { alignItems: 'flex-end' },

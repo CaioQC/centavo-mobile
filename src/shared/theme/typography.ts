@@ -9,11 +9,22 @@ export const fontFamily = {
   extrabold: 'PlusJakartaSans_800ExtraBold',
 } as const;
 
-export type TextVariant = 'title' | 'heading' | 'body' | 'bodyStrong' | 'caption' | 'captionMoney' | 'money';
+export type TextVariant =
+  | 'title'
+  | 'titleMoney'
+  | 'heading'
+  | 'headingMoney'
+  | 'body'
+  | 'bodyStrong'
+  | 'caption'
+  | 'captionMoney'
+  | 'money';
 
 export const textStyles: Record<TextVariant, TextStyle> = {
   title: { fontFamily: fontFamily.extrabold, fontSize: 28, lineHeight: 34 },
+  titleMoney: { fontFamily: fontFamily.extrabold, fontSize: 28, lineHeight: 34, fontVariant: ['tabular-nums'] },
   heading: { fontFamily: fontFamily.bold, fontSize: 18, lineHeight: 24 },
+  headingMoney: { fontFamily: fontFamily.bold, fontSize: 18, lineHeight: 24, fontVariant: ['tabular-nums'] },
   body: { fontFamily: fontFamily.regular, fontSize: 15, lineHeight: 22 },
   bodyStrong: { fontFamily: fontFamily.semibold, fontSize: 15, lineHeight: 22 },
   caption: { fontFamily: fontFamily.medium, fontSize: 12, lineHeight: 16 },

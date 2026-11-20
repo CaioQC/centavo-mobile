@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { AppText, Button } from '../../shared/components';
-import { fontFamily, radius, spacing, useTheme } from '../../shared/theme';
+import { AppText, Button, Input } from '../../shared/components';
+import { spacing } from '../../shared/theme';
 
 interface NoteEditorProps {
   /** observação já gravada ('' quando não há) */
@@ -13,7 +13,6 @@ interface NoteEditorProps {
 
 /** Campo de observação com botão "Salvar observação" (ativo só quando o texto mudou). */
 export function NoteEditor({ initial, onSave }: NoteEditorProps) {
-  const { colors } = useTheme();
   const [text, setText] = useState(initial);
   const [saved, setSaved] = useState(initial.trim());
   const [saving, setSaving] = useState(false);
@@ -39,19 +38,18 @@ export function NoteEditor({ initial, onSave }: NoteEditorProps) {
       <AppText variant="bodyStrong" accessibilityRole="header">
         Observação
       </AppText>
-      <TextInput
+      <Input
         accessibilityLabel="Observação"
         placeholder="Escreva uma observação sobre este lançamento"
-        placeholderTextColor={colors.muted}
         value={text}
         onChangeText={setText}
         multiline
         maxLength={500}
         textAlignVertical="top"
-        style={[styles.input, { backgroundColor: colors.card, borderColor: colors.cardBorder, color: colors.text }]}
+        style={styles.input}
       />
       {failed ? (
-        <AppText variant="caption" style={{ color: colors.over }} accessibilityLiveRegion="polite">
+        <AppText variant="caption" tone="danger" accessibilityLiveRegion="polite">
           Não foi possível salvar a observação. Tente de novo.
         </AppText>
       ) : null}
@@ -67,15 +65,7 @@ export function NoteEditor({ initial, onSave }: NoteEditorProps) {
 
 const styles = StyleSheet.create({
   root: { gap: spacing.sm },
-  input: {
-    minHeight: 96,
-    padding: spacing.md,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    fontFamily: fontFamily.regular,
-    fontSize: 15,
-    lineHeight: 22,
-  },
+  input: { minHeight: 96, padding: spacing.md, lineHeight: 22 },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   caption: { flexShrink: 1 },
 });

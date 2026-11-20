@@ -1,11 +1,11 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Clock } from 'lucide-react-native';
 
 import type { CategoryBudgetLine } from '../../core/budget';
 import { formatCents } from '../../core/money';
 import type { Category } from '../../data/types';
-import { AppText, CategoryBadge } from '../../shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '../../shared/theme';
+import { AppText, CategoryBadge, ListRow } from '../../shared/components';
+import { radius, spacing, useTheme } from '../../shared/theme';
 import { BudgetBar } from './BudgetBar';
 import { usageText } from './usageText';
 
@@ -36,22 +36,20 @@ export function BudgetRow({ category, line, onPress }: BudgetRowProps) {
     .filter((part): part is string => part !== null)
     .join(', ');
 
-  const content = (
-    <>
-      <View style={styles.header}>
-        <CategoryBadge icon={category.icon} color={category.color} />
-        <View style={styles.texts}>
-          <AppText variant="bodyStrong" numberOfLines={1}>
-            {category.name}
-          </AppText>
-          <AppText variant="captionMoney" tone="muted">
-            {amounts}
-          </AppText>
-        </View>
+  return (
+    <ListRow
+      leading={<CategoryBadge icon={category.icon} color={category.color} />}
+      title={category.name}
+      subtitle={amounts}
+      subtitleVariant="captionMoney"
+      trailing={
         <AppText variant="caption" style={{ color: statusColor }}>
           {usageText(line.usage)}
         </AppText>
-      </View>
+      }
+      accessibilityLabel={label}
+      onPress={onPress}
+    >
       <BudgetBar usage={line.usage} color={categoryColor} />
       {line.committedInCents > 0 ? (
         <View style={[styles.committed, { backgroundColor: colors.track }]}>
@@ -61,28 +59,11 @@ export function BudgetRow({ category, line, onPress }: BudgetRowProps) {
           </AppText>
         </View>
       ) : null}
-    </>
-  );
-
-  const style = [styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }];
-  if (!onPress) {
-    return (
-      <View accessible accessibilityLabel={label} style={style}>
-        {content}
-      </View>
-    );
-  }
-  return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={style}>
-      {content}
-    </Pressable>
+    </ListRow>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { minHeight: MIN_TOUCH_SIZE + spacing.lg, gap: spacing.md, padding: spacing.md, borderRadius: radius.card, borderWidth: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  texts: { flex: 1 },
   committed: {
     flexDirection: 'row',
     alignItems: 'center',

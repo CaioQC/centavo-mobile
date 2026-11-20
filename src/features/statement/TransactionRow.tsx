@@ -1,10 +1,8 @@
-import { Pressable, StyleSheet, View } from 'react-native';
-
 import { formatSignedCents } from '../../core/money';
 import { formatInstallment } from '../../core/labels';
 import type { Category, Transaction } from '../../data/types';
-import { AppText, CategoryBadge } from '../../shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '../../shared/theme';
+import { AppText, CategoryBadge, ListRow } from '../../shared/components';
+import { useTheme } from '../../shared/theme';
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -23,52 +21,19 @@ export function TransactionRow({ transaction, category, onPress }: TransactionRo
   const isIncome = transaction.amountInCents > 0;
   const amountText = formatSignedCents(transaction.amountInCents);
 
-  const content = (
-    <>
-      <CategoryBadge icon={category?.icon} color={category?.color} />
-      <View style={styles.texts}>
-        <AppText variant="bodyStrong" numberOfLines={1}>
-          {transaction.description}
-        </AppText>
-        <AppText variant="caption" tone="muted" numberOfLines={1}>
-          {subtitle}
-        </AppText>
-      </View>
-      <AppText variant="money" style={isIncome ? { color: colors.income } : undefined}>
-        {amountText}
-      </AppText>
-    </>
-  );
-
-  const style = [styles.row, { backgroundColor: colors.card, borderColor: colors.cardBorder }];
-  if (!onPress) {
-    return (
-      <View accessible accessibilityLabel={`${transaction.description}, ${subtitle}, ${amountText}`} style={style}>
-        {content}
-      </View>
-    );
-  }
   return (
-    <Pressable
-      accessibilityRole="button"
+    <ListRow
+      leading={<CategoryBadge icon={category?.icon} color={category?.color} />}
+      title={transaction.description}
+      subtitle={subtitle}
+      subtitleLines={1}
+      trailing={
+        <AppText variant="money" style={isIncome ? { color: colors.income } : undefined}>
+          {amountText}
+        </AppText>
+      }
       accessibilityLabel={`${transaction.description}, ${subtitle}, ${amountText}`}
       onPress={onPress}
-      style={style}
-    >
-      {content}
-    </Pressable>
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    minHeight: MIN_TOUCH_SIZE + spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: radius.card,
-    borderWidth: 1,
-  },
-  texts: { flex: 1 },
-});

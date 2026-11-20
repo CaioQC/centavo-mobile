@@ -1,32 +1,35 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { TransactionKind } from '../../core/newTransaction';
-import { AppText } from '../../shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '../../shared/theme';
+import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '../theme';
+import { AppText } from './AppText';
 
-interface KindSwitchProps {
-  value: TransactionKind;
-  onChange: (kind: TransactionKind) => void;
+export interface SegmentOption<T extends string> {
+  value: T;
+  label: string;
+  /** Texto lido pelo leitor de tela, quando `label` sozinho não basta ("Tema Claro"). */
+  accessibilityLabel?: string;
 }
 
-const OPTIONS: { kind: TransactionKind; label: string }[] = [
-  { kind: 'EXPENSE', label: 'Despesa' },
-  { kind: 'INCOME', label: 'Receita' },
-];
+interface SegmentedControlProps<T extends string> {
+  options: readonly SegmentOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+}
 
-/** Alternador Despesa / Receita. */
-export function KindSwitch({ value, onChange }: KindSwitchProps) {
+/** Alternador de uma escolha entre poucas opções (Despesa / Receita, Sistema / Claro / Escuro). */
+export function SegmentedControl<T extends string>({ options, value, onChange }: SegmentedControlProps<T>) {
   const { colors } = useTheme();
   return (
     <View style={[styles.root, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-      {OPTIONS.map((option) => {
-        const selected = option.kind === value;
+      {options.map((option) => {
+        const selected = option.value === value;
         return (
           <Pressable
-            key={option.kind}
+            key={option.value}
             accessibilityRole="button"
+            accessibilityLabel={option.accessibilityLabel}
             accessibilityState={{ selected }}
-            onPress={() => onChange(option.kind)}
+            onPress={() => onChange(option.value)}
             style={[styles.option, selected && { backgroundColor: colors.accent }]}
           >
             <AppText variant="bodyStrong" style={{ color: selected ? colors.onAccent : colors.muted }}>

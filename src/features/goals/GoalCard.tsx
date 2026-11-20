@@ -1,11 +1,11 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { formatDateInput } from '../../core/dateInput';
 import { goalProgress } from '../../core/goals';
 import { formatCents } from '../../core/money';
 import type { Goal } from '../../data/types';
-import { AppText, CategoryBadge } from '../../shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '../../shared/theme';
+import { AppText, CategoryBadge, ListRow } from '../../shared/components';
+import { useTheme } from '../../shared/theme';
 import { GoalProgressBar } from './GoalProgressBar';
 
 /** Texto do estado da meta: "Meta batida" ou "Faltam R$ 1.000,00". */
@@ -30,22 +30,20 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
     .filter((part): part is string => part !== null)
     .join(', ');
 
-  const content = (
-    <>
-      <View style={styles.header}>
-        <CategoryBadge icon={goal.icon} color={goal.color} />
-        <View style={styles.texts}>
-          <AppText variant="bodyStrong" numberOfLines={1}>
-            {goal.name}
-          </AppText>
-          <AppText variant="captionMoney" tone="muted">
-            {amounts}
-          </AppText>
-        </View>
+  return (
+    <ListRow
+      leading={<CategoryBadge icon={goal.icon} color={goal.color} />}
+      title={goal.name}
+      subtitle={amounts}
+      subtitleVariant="captionMoney"
+      trailing={
         <AppText variant="caption" style={{ color: progress.completed ? colors.income : colors.muted }}>
           {progress.percent}%
         </AppText>
-      </View>
+      }
+      accessibilityLabel={label}
+      onPress={onPress}
+    >
       <GoalProgressBar ratio={progress.ratio} color={color} completed={progress.completed} />
       <View style={styles.footer}>
         <AppText variant="captionMoney" style={{ color: progress.completed ? colors.income : colors.text }}>
@@ -57,27 +55,10 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
           </AppText>
         ) : null}
       </View>
-    </>
-  );
-
-  const style = [styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }];
-  if (!onPress) {
-    return (
-      <View accessible accessibilityLabel={label} style={style}>
-        {content}
-      </View>
-    );
-  }
-  return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={style}>
-      {content}
-    </Pressable>
+    </ListRow>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { minHeight: MIN_TOUCH_SIZE + spacing.lg, gap: spacing.md, padding: spacing.md, borderRadius: radius.card, borderWidth: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  texts: { flex: 1 },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 });
