@@ -1,9 +1,7 @@
-import { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { useState } from 'react';
+import { Alert } from 'react-native';
 import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { maskDateInput } from '@/core/dateInput';
 import { todayLocal } from '@/core/dates';
 import {
   DEFAULT_GOAL_APPEARANCE,
@@ -12,17 +10,12 @@ import {
   validateNewGoal,
   type NewGoalForm,
 } from '@/core/goals';
-import { formatCents, parseDigitsToCents } from '@/core/money';
 import { createGoal } from '@/data/repositories';
 import { useDatabase } from '@/data/useDbQuery';
 import { GoalIconPicker } from '@/features/goals/GoalIconPicker';
-import { Field } from '@/features/newTransaction/Field';
-import { Button, Screen } from '@/shared/components';
-import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
+import { Button, DateField, Field, MoneyField, Screen, TextField } from '@/shared/components';
 
 export default function NewGoalScreen() {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const db = useDatabase();
 
   const [name, setName] = useState('');
@@ -34,10 +27,6 @@ export default function NewGoalScreen() {
 
   const form: NewGoalForm = { name, targetInCents, targetDateText, icon };
   const errors = submitted ? validateNewGoal(form, todayLocal()) : {};
-  const inputStyle = useMemo(
-    () => ({ backgroundColor: colors.card, borderColor: colors.cardBorder, color: colors.text }),
-    [colors],
-  );
 
   const save = async () => {
     setSubmitted(true);
@@ -54,69 +43,32 @@ export default function NewGoalScreen() {
   };
 
   return (
-    <Screen title="Nova meta" onBack={() => router.back()}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}
-      >
-        <Field label="Nome" error={errors.name}>
-          <TextInput
-            accessibilityLabel="Nome"
-            placeholder="Ex.: Viagem, Reserva de emergência"
-            placeholderTextColor={colors.muted}
-            value={name}
-            onChangeText={setName}
-            maxLength={MAX_GOAL_NAME_LENGTH}
-            style={[styles.input, inputStyle]}
-          />
-        </Field>
+    <Screen title="Nova meta" onBack={() => router.back()} scroll form>
+      <TextField
+        label="Nome"
+        error={errors.name}
+        placeholder="Ex.: Viagem, Reserva de emergência"
+        value={name}
+        onChangeText={setName}
+        maxLength={MAX_GOAL_NAME_LENGTH}
+      />
 
-        <Field label="Valor-alvo" error={errors.target}>
-          <TextInput
-            accessibilityLabel="Valor-alvo"
-            keyboardType="number-pad"
-            placeholder="R$ 0,00"
-            placeholderTextColor={colors.muted}
-            value={targetInCents === 0 ? '' : formatCents(targetInCents)}
-            onChangeText={(text) => setTargetInCents(parseDigitsToCents(text))}
-            style={[styles.input, styles.amount, inputStyle]}
-          />
-        </Field>
+      <MoneyField label="Valor-alvo" error={errors.target} valueInCents={targetInCents} onChangeCents={setTargetInCents} />
 
-        <Field label="Data-alvo (opcional)" error={errors.targetDate} hint="Deixe em branco se não houver prazo.">
-          <TextInput
-            accessibilityLabel="Data-alvo"
-            keyboardType="number-pad"
-            placeholder="DD/MM/AAAA"
-            placeholderTextColor={colors.muted}
-            value={targetDateText}
-            onChangeText={(text) => setTargetDateText(maskDateInput(text))}
-            maxLength={10}
-            style={[styles.input, inputStyle]}
-          />
-        </Field>
+      <DateField
+        label="Data-alvo (opcional)"
+        accessibilityLabel="Data-alvo"
+        error={errors.targetDate}
+        hint="Deixe em branco se não houver prazo."
+        value={targetDateText}
+        onChangeText={setTargetDateText}
+      />
 
-        <Field label="Ícone" error={errors.icon}>
-          <GoalIconPicker value={icon} onChange={setIcon} />
-        </Field>
+      <Field label="Ícone" error={errors.icon}>
+        <GoalIconPicker value={icon} onChange={setIcon} />
+      </Field>
 
-        <Button label="Criar meta" loading={saving} onPress={save} />
-      </ScrollView>
+      <Button label="Criar meta" loading={saving} onPress={save} />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
-  input: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    fontFamily: fontFamily.regular,
-    fontSize: 15,
-  },
-  amount: { fontFamily: fontFamily.extrabold, fontSize: 24, fontVariant: ['tabular-nums'] },
-});

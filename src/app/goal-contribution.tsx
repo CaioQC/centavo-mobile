@@ -1,23 +1,18 @@
-import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Alert, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Target, TriangleAlert } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Target } from 'lucide-react-native';
 
-import { formatDateInput, maskDateInput, parseDateInput } from '@/core/dateInput';
+import { formatDateInput, parseDateInput } from '@/core/dateInput';
 import { todayLocal } from '@/core/dates';
 import { validateContribution, type ContributionKind } from '@/core/goals';
-import { formatCents, parseDigitsToCents } from '@/core/money';
+import { formatCents } from '@/core/money';
 import type { Database } from '@/data/database';
 import { addContribution, ContributionExceedsBalanceError, getGoal } from '@/data/repositories';
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
-import { Field } from '@/features/newTransaction/Field';
-import { AppText, Button, EmptyState, Screen } from '@/shared/components';
-import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
+import { AppText, Button, DateField, MoneyField, QueryFallback, Screen } from '@/shared/components';
 
 export default function GoalContributionScreen() {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const db = useDatabase();
   const params = useLocalSearchParams<{ goalId?: string; kind?: string }>();
   const goalId = params.goalId ?? '';
@@ -30,10 +25,6 @@ export default function GoalContributionScreen() {
   const [dateText, setDateText] = useState(() => formatDateInput(todayLocal()));
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
-  const inputStyle = useMemo(
-    () => ({ backgroundColor: colors.card, borderColor: colors.cardBorder, color: colors.text }),
-    [colors],
-  );
 
   const isWithdrawal = kind === 'WITHDRAWAL';
   const title = isWithdrawal ? 'Retirar da meta' : 'Novo aporte';
@@ -41,22 +32,13 @@ export default function GoalContributionScreen() {
   const goal = result.data ?? null;
 
   if (!goal) {
-    const failed = result.status === 'error';
-    if (result.status === 'loading') {
-      return (
-        <Screen title={title} onBack={goBack}>
-          <ActivityIndicator accessibilityLabel="Carregando" color={colors.muted} />
-        </Screen>
-      );
-    }
     return (
       <Screen title={title} onBack={goBack}>
-        <EmptyState
-          icon={failed ? TriangleAlert : Target}
-          title={failed ? 'Não foi possível carregar a meta' : 'Meta não encontrada'}
-          message={failed ? 'Algo deu errado ao ler os dados do aparelho. Tente de novo.' : 'Volte às metas e escolha outra.'}
-          actionLabel={failed ? 'Tentar de novo' : 'Voltar'}
-          onAction={failed ? result.reload : goBack}
+        <QueryFallback
+          status={result.status}
+          errorTitle="Não foi possível carregar a meta"
+          onRetry={result.reload}
+          notFound={{ icon: Target, title: 'Meta não encontrada', message: 'Volte às metas e escolha outra.', onBack: goBack }}
         />
       </Screen>
     );
@@ -84,75 +66,19 @@ export default function GoalContributionScreen() {
   };
 
   return (
-    <Screen title={title} onBack={goBack}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}
-      >
-        <View>
-          <AppText variant="heading">{goal.name}</AppText>
-          <AppText variant="captionMoney" tone="muted">
-            Guardado: {formatCents(Math.max(goal.savedInCents, 0))}
-          </AppText>
-        </View>
+    <Screen title={title} onBack={goBack} scroll form>
+      <View>
+        <AppText variant="heading">{goal.name}</AppText>
+        <AppText variant="captionMoney" tone="muted">
+          Guardado: {formatCents(Math.max(goal.savedInCents, 0))}
+        </AppText>
+      </View>
 
-        <Field label="Valor" error={errors.amount}>
-          <TextInput
-            accessibilityLabel="Valor"
-            keyboardType="number-pad"
-            placeholder="R$ 0,00"
-            placeholderTextColor={colors.muted}
-            value={amountInCents === 0 ? '' : formatCents(amountInCents)}
-            onChangeText={(text) => setAmountInCents(parseDigitsToCents(text))}
-            style={[styles.input, styles.amount, inputStyle]}
-          />
-        </Field>
+      <MoneyField label="Valor" error={errors.amount} valueInCents={amountInCents} onChangeCents={setAmountInCents} />
 
-        <Field label="Data" error={errors.date}>
-          <View style={styles.dateRow}>
-            <TextInput
-              accessibilityLabel="Data"
-              keyboardType="number-pad"
-              placeholder="DD/MM/AAAA"
-              placeholderTextColor={colors.muted}
-              value={dateText}
-              onChangeText={(text) => setDateText(maskDateInput(text))}
-              maxLength={10}
-              style={[styles.input, styles.dateInput, inputStyle]}
-            />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Usar a data de hoje"
-              onPress={() => setDateText(formatDateInput(todayLocal()))}
-              style={styles.today}
-            >
-              <AppText tone="accent" variant="bodyStrong">
-                Hoje
-              </AppText>
-            </Pressable>
-          </View>
-        </Field>
+      <DateField label="Data" error={errors.date} value={dateText} onChangeText={setDateText} showToday />
 
-        <Button label={isWithdrawal ? 'Registrar retirada' : 'Registrar aporte'} loading={saving} onPress={save} />
-      </ScrollView>
+      <Button label={isWithdrawal ? 'Registrar retirada' : 'Registrar aporte'} loading={saving} onPress={save} />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
-  input: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    fontFamily: fontFamily.regular,
-    fontSize: 15,
-  },
-  amount: { fontFamily: fontFamily.extrabold, fontSize: 24, fontVariant: ['tabular-nums'] },
-  dateRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  dateInput: { flex: 1 },
-  today: { minHeight: MIN_TOUCH_SIZE, minWidth: MIN_TOUCH_SIZE, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md },
-});

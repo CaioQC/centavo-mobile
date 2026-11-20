@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ReceiptText, TriangleAlert } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ReceiptText } from 'lucide-react-native';
 
 import { formatFullDate, formatInstallment } from '@/core/labels';
 import { formatSignedCents } from '@/core/money';
@@ -16,13 +15,12 @@ import {
 } from '@/data/repositories';
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
 import { NoteEditor } from '@/features/transaction/NoteEditor';
-import { AppText, Button, EmptyState, Screen, SelectField, type SelectOption } from '@/shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '@/shared/theme';
+import { AppText, Button, Card, EmptyState, QueryFallback, Screen, SelectField, type SelectOption } from '@/shared/components';
+import { MIN_TOUCH_SIZE, spacing, useTheme } from '@/shared/theme';
 
 export default function TransactionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const db = useDatabase();
 
   const load = useCallback(
@@ -56,17 +54,7 @@ export default function TransactionDetailScreen() {
   if (!result.data) {
     return (
       <Screen title="Transação" onBack={goBack}>
-        {result.status === 'error' ? (
-          <EmptyState
-            icon={TriangleAlert}
-            title="Não foi possível carregar o lançamento"
-            message="Algo deu errado ao ler os dados do aparelho. Tente de novo."
-            actionLabel="Tentar de novo"
-            onAction={result.reload}
-          />
-        ) : (
-          <ActivityIndicator accessibilityLabel="Carregando" color={colors.muted} />
-        )}
+        <QueryFallback status={result.status} errorTitle="Não foi possível carregar o lançamento" onRetry={result.reload} />
       </Screen>
     );
   }
@@ -137,71 +125,66 @@ export default function TransactionDetailScreen() {
   ];
 
   return (
-    <Screen title="Transação" onBack={goBack}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}
-      >
-        <View style={styles.summary}>
-          <AppText variant="title" style={[styles.amount, { color: amountColor }]} accessibilityLabel={formatSignedCents(transaction.amountInCents)}>
-            {formatSignedCents(transaction.amountInCents)}
-          </AppText>
-          <AppText variant="heading">{transaction.description}</AppText>
-        </View>
+    <Screen title="Transação" onBack={goBack} scroll form>
+      <View style={styles.summary}>
+        <AppText
+          variant="titleMoney"
+          style={{ color: amountColor }}
+          accessibilityLabel={formatSignedCents(transaction.amountInCents)}
+        >
+          {formatSignedCents(transaction.amountInCents)}
+        </AppText>
+        <AppText variant="heading">{transaction.description}</AppText>
+      </View>
 
-        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-          {rows.map((row) => (
-            <View key={row.label} style={styles.infoRow}>
-              <AppText tone="muted">{row.label}</AppText>
-              <AppText variant="bodyStrong" style={styles.infoValue}>
-                {row.value}
-              </AppText>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.selectRow}>
-            <SelectField
-              label="Categoria"
-              sheetTitle="Escolher categoria"
-              value={transaction.categoryId}
-              options={categoryOptions}
-              onChange={changeCategory}
-            />
+      <Card style={styles.card}>
+        {rows.map((row) => (
+          <View key={row.label} style={styles.infoRow}>
+            <AppText tone="muted">{row.label}</AppText>
+            <AppText variant="bodyStrong" style={styles.infoValue}>
+              {row.value}
+            </AppText>
           </View>
-          <AppText variant="caption" tone="muted">
-            {transaction.categorySource === 'MANUAL'
-              ? 'Você escolheu esta categoria; uma nova importação não a altera.'
-              : 'Categoria vinda do banco. Toque para trocar por outra.'}
-          </AppText>
-        </View>
+        ))}
+      </Card>
 
-        <NoteEditor key={transaction.id} initial={transaction.note ?? ''} onSave={saveNote} />
-
-        {isManual ? (
-          <Button
-            label={isInstallment ? 'Excluir compra parcelada' : 'Excluir lançamento'}
-            variant="danger"
-            onPress={confirmRemove}
+      <View style={styles.section}>
+        <View style={styles.selectRow}>
+          <SelectField
+            label="Categoria"
+            sheetTitle="Escolher categoria"
+            value={transaction.categoryId}
+            options={categoryOptions}
+            onChange={changeCategory}
           />
-        ) : (
-          <AppText variant="caption" tone="muted" style={styles.note}>
-            Lançamentos importados do banco não podem ser excluídos; só recategorizados e anotados.
-          </AppText>
-        )}
-      </ScrollView>
+        </View>
+        <AppText variant="caption" tone="muted">
+          {transaction.categorySource === 'MANUAL'
+            ? 'Você escolheu esta categoria; uma nova importação não a altera.'
+            : 'Categoria vinda do banco. Toque para trocar por outra.'}
+        </AppText>
+      </View>
+
+      <NoteEditor key={transaction.id} initial={transaction.note ?? ''} onSave={saveNote} />
+
+      {isManual ? (
+        <Button
+          label={isInstallment ? 'Excluir compra parcelada' : 'Excluir lançamento'}
+          variant="danger"
+          onPress={confirmRemove}
+        />
+      ) : (
+        <AppText variant="caption" tone="muted" style={styles.note}>
+          Lançamentos importados do banco não podem ser excluídos; só recategorizados e anotados.
+        </AppText>
+      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
   summary: { gap: spacing.xs },
-  amount: { fontVariant: ['tabular-nums'] },
-  card: { borderRadius: radius.card, borderWidth: 1, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
+  card: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
   infoRow: {
     minHeight: MIN_TOUCH_SIZE,
     flexDirection: 'row',

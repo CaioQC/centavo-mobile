@@ -1,13 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Alert } from 'react-native';
 import { router } from 'expo-router';
-import { Landmark, TriangleAlert } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Landmark } from 'lucide-react-native';
 
 import { todayLocal } from '@/core/dates';
-import { formatDateInput, maskDateInput, parseDateInput } from '@/core/dateInput';
+import { formatDateInput, parseDateInput } from '@/core/dateInput';
 import { splitInstallments } from '@/core/installments';
-import { formatCents, parseDigitsToCents } from '@/core/money';
+import { formatCents } from '@/core/money';
 import {
   MAX_DESCRIPTION_LENGTH,
   validateNewTransaction,
@@ -17,16 +16,28 @@ import {
 import type { Database } from '@/data/database';
 import { createManualTransactions, listAccounts, listCategories } from '@/data/repositories';
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
-import { Field } from '@/features/newTransaction/Field';
-import { KindSwitch } from '@/features/newTransaction/KindSwitch';
-import { AppText, Button, EmptyState, Screen, SelectField, type SelectOption } from '@/shared/components';
-import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
+import {
+  Button,
+  DateField,
+  EmptyState,
+  MoneyField,
+  QueryFallback,
+  Screen,
+  SegmentedControl,
+  SelectFormField,
+  TextField,
+  type SegmentOption,
+  type SelectOption,
+} from '@/shared/components';
+
+const KIND_OPTIONS: SegmentOption<TransactionKind>[] = [
+  { value: 'EXPENSE', label: 'Despesa' },
+  { value: 'INCOME', label: 'Receita' },
+];
 
 const INSTALLMENT_CHOICES = Array.from({ length: 12 }, (_, index) => index + 1);
 
 export default function NewTransactionScreen() {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const db = useDatabase();
 
   const load = useCallback(async (database: Database) => {
@@ -121,17 +132,12 @@ export default function NewTransactionScreen() {
   if (!result.data) {
     return (
       <Screen title="Novo lançamento" onBack={goBack}>
-        {result.status === 'error' ? (
-          <EmptyState
-            icon={TriangleAlert}
-            title="Não foi possível carregar o formulário"
-            message="Algo deu errado ao ler as contas do aparelho. Tente de novo."
-            actionLabel="Tentar de novo"
-            onAction={result.reload}
-          />
-        ) : (
-          <ActivityIndicator accessibilityLabel="Carregando" color={colors.muted} />
-        )}
+        <QueryFallback
+          status={result.status}
+          errorTitle="Não foi possível carregar o formulário"
+          errorMessage="Algo deu errado ao ler as contas do aparelho. Tente de novo."
+          onRetry={result.reload}
+        />
       </Screen>
     );
   }
@@ -151,125 +157,53 @@ export default function NewTransactionScreen() {
   }
 
   return (
-    <Screen title="Novo lançamento" onBack={goBack}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}
-      >
-        <KindSwitch value={kind} onChange={changeKind} />
+    <Screen title="Novo lançamento" onBack={goBack} scroll form>
+      <SegmentedControl options={KIND_OPTIONS} value={kind} onChange={changeKind} />
 
-        <Field label="Valor" error={errors.amount}>
-          <TextInput
-            accessibilityLabel="Valor"
-            keyboardType="number-pad"
-            placeholder="R$ 0,00"
-            placeholderTextColor={colors.muted}
-            value={amountInCents === 0 ? '' : formatCents(amountInCents)}
-            onChangeText={(text) => setAmountInCents(parseDigitsToCents(text))}
-            style={[styles.input, styles.amount, inputColors(colors)]}
-          />
-        </Field>
+      <MoneyField label="Valor" error={errors.amount} valueInCents={amountInCents} onChangeCents={setAmountInCents} />
 
-        <Field label="Descrição" error={errors.description}>
-          <TextInput
-            accessibilityLabel="Descrição"
-            placeholder="Ex.: Mercado, Salário"
-            placeholderTextColor={colors.muted}
-            value={description}
-            onChangeText={setDescription}
-            maxLength={MAX_DESCRIPTION_LENGTH}
-            style={[styles.input, inputColors(colors)]}
-          />
-        </Field>
+      <TextField
+        label="Descrição"
+        error={errors.description}
+        placeholder="Ex.: Mercado, Salário"
+        value={description}
+        onChangeText={setDescription}
+        maxLength={MAX_DESCRIPTION_LENGTH}
+      />
 
-        <Field label="Conta" error={errors.account}>
-          <View style={styles.selectRow}>
-            <SelectField
-              label="Conta"
-              sheetTitle="Escolher conta"
-              value={accountId}
-              options={accountOptions}
-              onChange={(value) => setChosenAccountId(value)}
-            />
-          </View>
-        </Field>
+      <SelectFormField
+        label="Conta"
+        sheetTitle="Escolher conta"
+        error={errors.account}
+        value={accountId}
+        options={accountOptions}
+        onChange={(value) => setChosenAccountId(value)}
+      />
 
-        <Field label="Categoria" error={errors.category}>
-          <View style={styles.selectRow}>
-            <SelectField
-              label="Categoria"
-              sheetTitle="Escolher categoria"
-              value={categoryId}
-              options={categoryOptions}
-              onChange={setCategoryId}
-            />
-          </View>
-        </Field>
+      <SelectFormField
+        label="Categoria"
+        sheetTitle="Escolher categoria"
+        error={errors.category}
+        value={categoryId}
+        options={categoryOptions}
+        onChange={setCategoryId}
+      />
 
-        <Field label="Data" error={errors.date}>
-          <View style={styles.dateRow}>
-            <TextInput
-              accessibilityLabel="Data"
-              keyboardType="number-pad"
-              placeholder="DD/MM/AAAA"
-              placeholderTextColor={colors.muted}
-              value={dateText}
-              onChangeText={(text) => setDateText(maskDateInput(text))}
-              maxLength={10}
-              style={[styles.input, styles.dateInput, inputColors(colors)]}
-            />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Usar a data de hoje"
-              onPress={() => setDateText(formatDateInput(todayLocal()))}
-              style={styles.today}
-            >
-              <AppText tone="accent" variant="bodyStrong">
-                Hoje
-              </AppText>
-            </Pressable>
-          </View>
-        </Field>
+      <DateField label="Data" error={errors.date} value={dateText} onChangeText={setDateText} showToday />
 
-        {canSplit ? (
-          <Field label="Parcelas" error={errors.installments} hint={installmentPreview}>
-            <View style={styles.selectRow}>
-              <SelectField
-                label="Parcelas"
-                sheetTitle="Número de parcelas"
-                value={String(installments)}
-                options={installmentOptions}
-                onChange={(value) => setChosenInstallments(Number(value ?? 1))}
-              />
-            </View>
-          </Field>
-        ) : null}
+      {canSplit ? (
+        <SelectFormField
+          label="Parcelas"
+          sheetTitle="Número de parcelas"
+          error={errors.installments}
+          hint={installmentPreview}
+          value={String(installments)}
+          options={installmentOptions}
+          onChange={(value) => setChosenInstallments(Number(value ?? 1))}
+        />
+      ) : null}
 
-        <Button label="Salvar lançamento" loading={saving} onPress={save} />
-      </ScrollView>
+      <Button label="Salvar lançamento" loading={saving} onPress={save} />
     </Screen>
   );
 }
-
-function inputColors(colors: ReturnType<typeof useTheme>['colors']) {
-  return { backgroundColor: colors.card, borderColor: colors.cardBorder, color: colors.text };
-}
-
-const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
-  input: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    fontFamily: fontFamily.regular,
-    fontSize: 15,
-  },
-  amount: { fontFamily: fontFamily.extrabold, fontSize: 24, fontVariant: ['tabular-nums'] },
-  selectRow: { flexDirection: 'row' },
-  dateRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  dateInput: { flex: 1 },
-  today: { minHeight: MIN_TOUCH_SIZE, minWidth: MIN_TOUCH_SIZE, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md },
-});

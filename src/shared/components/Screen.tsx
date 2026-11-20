@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 
@@ -12,11 +12,17 @@ interface ScreenProps {
   bottomInset?: number;
   /** Mostra o botão "Voltar" acima do título (telas empilhadas, fora das abas). */
   onBack?: () => void;
+  /** Conteúdo rolável (sem barra de rolagem), com o espaço do rodapé já descontado. */
+  scroll?: boolean;
+  /** Espaço entre os blocos do conteúdo rolável. */
+  gap?: number;
+  /** Conteúdo rolável de formulário: o teclado empurra o conteúdo e o toque num botão não é engolido por ele. */
+  form?: boolean;
   children: ReactNode;
 }
 
-/** Fundo, título e margens comuns das telas. */
-export function Screen({ title, bottomInset = 0, onBack, children }: ScreenProps) {
+/** Fundo, título e margens comuns das telas; com `scroll`, também a rolagem do conteúdo. */
+export function Screen({ title, bottomInset = 0, onBack, scroll = false, gap = spacing.lg, form = false, children }: ScreenProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   return (
@@ -34,7 +40,21 @@ export function Screen({ title, bottomInset = 0, onBack, children }: ScreenProps
       <AppText variant="title" accessibilityRole="header">
         {title}
       </AppText>
-      <View style={styles.content}>{children}</View>
+      <View style={styles.content}>
+        {scroll ? (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps={form ? 'handled' : undefined}
+            automaticallyAdjustKeyboardInsets={form}
+            // Dentro das abas o rodapé já é da barra flutuante (`bottomInset`); nas telas empilhadas é a área segura.
+            contentContainerStyle={{ gap, paddingBottom: bottomInset > 0 ? spacing.lg : insets.bottom + spacing.xl }}
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          children
+        )}
+      </View>
     </View>
   );
 }

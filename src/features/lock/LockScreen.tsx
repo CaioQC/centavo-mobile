@@ -31,7 +31,7 @@ export function LockScreen({ message, onRetry }: LockScreenProps) {
           Use sua digital, seu rosto ou o PIN do aparelho para abrir.
         </AppText>
         {message ? (
-          <AppText variant="caption" style={[styles.centered, { color: colors.over }]} accessibilityLiveRegion="polite">
+          <AppText variant="caption" tone="danger" style={styles.centered} accessibilityLiveRegion="polite">
             {message}
           </AppText>
         ) : null}

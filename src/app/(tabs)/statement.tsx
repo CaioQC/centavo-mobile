@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, SectionList, StyleSheet, View } from 'react-native';
+import { SectionList, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { ReceiptText, Search, TriangleAlert } from 'lucide-react-native';
+import { ReceiptText, Search } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { currentMonth, todayLocal, type YearMonth } from '@/core/dates';
@@ -14,7 +14,7 @@ import { useDbQuery } from '@/data/useDbQuery';
 import { MonthSelector } from '@/features/statement/MonthSelector';
 import { StatementFilters } from '@/features/statement/StatementFilters';
 import { TransactionRow } from '@/features/statement/TransactionRow';
-import { AppText, EmptyState, Screen, TAB_BAR_CLEARANCE } from '@/shared/components';
+import { AppText, EmptyState, QueryFallback, Screen, TAB_BAR_CLEARANCE } from '@/shared/components';
 import { spacing, useTheme } from '@/shared/theme';
 
 export default function StatementScreen() {
@@ -92,18 +92,15 @@ export default function StatementScreen() {
   );
 
   let empty = null;
-  if (result.status === 'error' && !data) {
+  if (!data) {
     empty = (
-      <EmptyState
-        icon={TriangleAlert}
-        title="Não foi possível carregar o extrato"
-        message="Algo deu errado ao ler os lançamentos do aparelho. Tente de novo."
-        actionLabel="Tentar de novo"
-        onAction={result.reload}
+      <QueryFallback
+        status={result.status}
+        errorTitle="Não foi possível carregar o extrato"
+        errorMessage="Algo deu errado ao ler os lançamentos do aparelho. Tente de novo."
+        onRetry={result.reload}
       />
     );
-  } else if (!data) {
-    empty = <ActivityIndicator accessibilityLabel="Carregando" color={colors.muted} />;
   } else if (hasFilters) {
     empty = (
       <EmptyState
