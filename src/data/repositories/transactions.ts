@@ -91,10 +91,15 @@ export async function insertTransactions(db: Database, items: NewTransaction[]):
 /**
  * Importação do banco simulado: insere ou atualiza pelo `external_id` (único por conta), sem duplicar.
  * Nunca mexe no que é do usuário: a observação fica como está e a categoria só é atualizada
- * enquanto `category_source` não for `MANUAL` (ADR 07).
+ * enquanto `category_source` não for `MANUAL` (ADR 07). Devolve `true` se a transação é nova
+ * (a importação conta quantas vieram), `false` se já existia e só foi atualizada.
  */
-export async function upsertImportedTransaction(db: Database, item: NewTransaction): Promise<void> {
+export async function upsertImportedTransaction(db: Database, item: NewTransaction): Promise<boolean> {
   if (item.externalId === null) throw new Error('Transação importada precisa de external_id.');
+  const existing = await db.getFirstAsync<{ id: string }>(
+    'SELECT id FROM transactions WHERE account_id = ? AND external_id = ?',
+    [item.accountId, item.externalId],
+  );
   await db.runAsync(
     `INSERT INTO transactions (${INSERT_COLUMNS}) VALUES (${PLACEHOLDERS})
      ON CONFLICT (account_id, external_id) WHERE external_id IS NOT NULL DO UPDATE SET
@@ -108,6 +113,7 @@ export async function upsertImportedTransaction(db: Database, item: NewTransacti
          THEN transactions.category_id ELSE excluded.category_id END`,
     insertParams(newId(), new Date().toISOString(), item),
   );
+  return existing === null;
 }
 
 /** Recategoriza (a escolha do usuário vence a da importação) e devolve quantas linhas mudaram. */
