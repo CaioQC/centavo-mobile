@@ -81,3 +81,26 @@ export interface NewTransaction {
   totalInstallments?: number | null;
   note?: string | null;
 }
+
+/** Meta de economia com o total já guardado (aportes menos retiradas). */
+export interface Goal {
+  id: string;
+  name: string;
+  targetInCents: number;
+  /** data-alvo opcional */
+  targetDate: LocalDate | null;
+  /** nome do ícone Lucide */
+  icon: string;
+  /** chave de cor do tema (CategoryColorKey) */
+  color: string;
+  createdAt: string;
+  savedInCents: number;
+}
+
+/** Aporte (positivo) ou retirada (negativo) de uma meta. */
+export interface GoalContribution {
+  id: string;
+  goalId: string;
+  amountInCents: number;
+  date: LocalDate;
+}

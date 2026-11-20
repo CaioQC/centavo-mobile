@@ -4,7 +4,13 @@ import { createTestDatabase } from '../testing/createTestDatabase';
 import type { NewTransaction } from '../types';
 import type { NewTransactionForm } from '../../core/newTransaction';
 import {
+  addContribution,
+  ContributionExceedsBalanceError,
+  createGoal,
   createManualAccount,
+  getGoal,
+  listContributions,
+  listGoals,
   createManualTransactions,
   deleteManualTransaction,
   getTransaction,
@@ -79,6 +85,58 @@ describe('início', () => {
     expect(list.map((t) => t.description)).toEqual(['C', 'B']);
   });
 
+});
+
+describe('metas', () => {
+  const newGoal = { name: '  Viagem  ', targetInCents: 300_000, targetDateText: '01/12/2027', icon: 'Plane', color: 'transport' };
+
+  it('cria a meta (nome sem espaços, data em ISO) e lista com o total guardado zerado', async () => {
+    const { db } = await setup();
+    const id = await createGoal(db, newGoal, '2026-11-14');
+    expect(await listGoals(db)).toEqual([
+      expect.objectContaining({ id, name: 'Viagem', targetInCents: 300_000, targetDate: '2027-12-01', savedInCents: 0 }),
+    ]);
+    const semData = await createGoal(db, { ...newGoal, name: 'Reserva', targetDateText: '' }, '2026-11-14');
+    expect((await getGoal(db, semData))?.targetDate).toBeNull();
+  });
+
+  it('recusa meta inválida sem gravar', async () => {
+    const { db } = await setup();
+    await expect(createGoal(db, { ...newGoal, targetInCents: 0 }, '2026-11-14')).rejects.toThrow(RangeError);
+    await expect(createGoal(db, { ...newGoal, targetDateText: '01/01/2020' }, '2026-11-14')).rejects.toThrow(RangeError);
+    expect(await listGoals(db)).toEqual([]);
+  });
+
+  it('aporte soma, retirada subtrai e a lista vem do mais recente ao mais antigo', async () => {
+    const { db } = await setup();
+    const id = await createGoal(db, newGoal, '2026-11-14');
+    await addContribution(db, id, 'DEPOSIT', 100_000, '2026-11-01');
+    await addContribution(db, id, 'DEPOSIT', 50_000, '2026-11-10');
+    await addContribution(db, id, 'WITHDRAWAL', 30_000, '2026-11-12');
+    expect((await getGoal(db, id))?.savedInCents).toBe(120_000);
+    expect((await listContributions(db, id)).map((c) => c.amountInCents)).toEqual([-30_000, 50_000, 100_000]);
+  });
+
+  it('retirada acima do guardado é recusada sem gravar; retirar exatamente o guardado vale', async () => {
+    const { db } = await setup();
+    const id = await createGoal(db, newGoal, '2026-11-14');
+    await expect(addContribution(db, id, 'WITHDRAWAL', 1, '2026-11-02')).rejects.toBeInstanceOf(ContributionExceedsBalanceError);
+    await addContribution(db, id, 'DEPOSIT', 10_000, '2026-11-01');
+    await expect(addContribution(db, id, 'WITHDRAWAL', 10_001, '2026-11-02')).rejects.toBeInstanceOf(ContributionExceedsBalanceError);
+    await addContribution(db, id, 'WITHDRAWAL', 10_000, '2026-11-02');
+    expect((await getGoal(db, id))?.savedInCents).toBe(0);
+    expect(await listContributions(db, id)).toHaveLength(2);
+  });
+
+  it('recusa valor, data ou meta inválidos', async () => {
+    const { db } = await setup();
+    const id = await createGoal(db, newGoal, '2026-11-14');
+    await expect(addContribution(db, id, 'DEPOSIT', 0, '2026-11-01')).rejects.toThrow(RangeError);
+    await expect(addContribution(db, id, 'DEPOSIT', 1.5, '2026-11-01')).rejects.toThrow(RangeError);
+    await expect(addContribution(db, id, 'DEPOSIT', 100, '2026-02-31')).rejects.toThrow(RangeError);
+    await expect(addContribution(db, 'nao-existe', 'DEPOSIT', 100, '2026-11-01')).rejects.toThrow(RangeError);
+    expect(await listContributions(db, id)).toEqual([]);
+  });
 });
 
 describe('orçamento', () => {
