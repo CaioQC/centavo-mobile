@@ -1,12 +1,10 @@
-import { useState, type ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Info, Landmark, Receipt, ShieldCheck, type LucideProps } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { findBank } from '@/data/banks/catalog';
-import { importBank } from '@/data/banks/import';
-import { useDatabase } from '@/data/useDbQuery';
 import { AppText, Button, EmptyState, Screen } from '@/shared/components';
 import { radius, spacing, useTheme } from '@/shared/theme';
 
@@ -25,9 +23,6 @@ export default function ConnectBankConsentScreen() {
   const { key } = useLocalSearchParams<{ key: string }>();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const db = useDatabase();
-  const [connecting, setConnecting] = useState(false);
-  const [failed, setFailed] = useState(false);
   const bank = findBank(key);
   const goBack = () => router.back();
 
@@ -45,17 +40,7 @@ export default function ConnectBankConsentScreen() {
     );
   }
 
-  const authorize = async () => {
-    setConnecting(true);
-    setFailed(false);
-    try {
-      await importBank(db, bank);
-      router.dismissTo('/accounts');
-    } catch {
-      setFailed(true);
-      setConnecting(false);
-    }
-  };
+  const authorize = () => router.replace({ pathname: '/connect-bank-sync', params: { key: bank.key } });
 
   return (
     <Screen title="Consentimento" onBack={goBack}>
@@ -117,17 +102,8 @@ export default function ConnectBankConsentScreen() {
         </View>
 
         <View style={styles.actions}>
-          {failed ? (
-            <AppText variant="caption" style={{ color: colors.over }} accessibilityLiveRegion="polite">
-              Não foi possível conectar. Nada foi importado pela metade. Tente de novo.
-            </AppText>
-          ) : null}
-          <Button
-            label={connecting ? 'Conectando…' : failed ? 'Tentar de novo' : 'Autorizar e conectar'}
-            loading={connecting}
-            onPress={() => void authorize()}
-          />
-          <Button label="Cancelar" variant="secondary" disabled={connecting} onPress={goBack} />
+          <Button label="Autorizar e conectar" onPress={authorize} />
+          <Button label="Cancelar" variant="secondary" onPress={goBack} />
         </View>
       </ScrollView>
     </Screen>
