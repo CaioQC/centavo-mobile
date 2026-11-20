@@ -45,4 +45,4 @@ Toda lista tem estado vazio com uma ação (ex.: "Nenhuma meta ainda. Criar meta
 | 17–24 s | Lança uma compra de R$ 300 em 3x no cartão; o orçamento mostra R$ 100 no mês e R$ 100 "já comprometido" no seguinte | Parcelas no mês certo (problema 2) |
 | 24–30 s | Faz um aporte numa meta e a barra avança | Metas (problema 3) |
 
-Para a apresentação em sala, ensaiar o mesmo roteiro com os dados de exemplo restaurados, para a demo sair igual ao vídeo.
+Para a apresentação em sala, ensaiar o mesmo roteiro com os dados limpos (o passo a passo, a fala e o plano B estão em [ensaio e vídeo](ensaio-e-video.md)).
