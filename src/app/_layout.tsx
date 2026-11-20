@@ -36,6 +36,7 @@ function AppShell() {
         <Stack.Screen name="new-transaction" options={{ presentation: 'modal' }} />
         <Stack.Screen name="accounts" />
         <Stack.Screen name="new-account" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="edit-limit" options={{ presentation: 'modal' }} />
         <Stack.Screen name="settings" />
       </Stack>
       <HideSplashWhenMounted />

@@ -15,7 +15,10 @@ import {
   listCategories,
   listRecentTransactions,
   listTransactionsByMonth,
-  getTotalBudgetInCents,
+  copyPreviousMonthLimitsIfNew,
+  listBudgetLimits,
+  listTransactionsByBudgetMonth,
+  setBudgetLimit,
   TransactionNotDeletableError,
   updateTransactionCategory,
   updateTransactionNote,
@@ -76,17 +79,65 @@ describe('início', () => {
     expect(list.map((t) => t.description)).toEqual(['C', 'B']);
   });
 
-  it('orçamento total do mês soma os limites; sem limites vale zero', async () => {
-    const { db, sqlite } = await setup();
-    expect(await getTotalBudgetInCents(db, '2026-11')).toBe(0);
-    for (const [id, month, category, limit] of [
-      ['b1', '2026-11', 'food', 80_000],
-      ['b2', '2026-11', 'housing', 120_000],
-      ['b3', '2026-12', 'food', 50_000],
-    ] as const) {
-      sqlite.prepare('INSERT INTO budgets (id, month, category_id, limit_in_cents) VALUES (?, ?, ?, ?)').run(id, month, category, limit);
-    }
-    expect(await getTotalBudgetInCents(db, '2026-11')).toBe(200_000);
+});
+
+describe('orçamento', () => {
+  it('define, altera e remove o limite (zero remove)', async () => {
+    const { db } = await setup();
+    await setBudgetLimit(db, '2026-11', 'food', 80_000);
+    await setBudgetLimit(db, '2026-11', 'housing', 120_000);
+    await setBudgetLimit(db, '2026-11', 'food', 90_000);
+    expect(await listBudgetLimits(db, '2026-11')).toEqual([
+      { categoryId: 'food', limitInCents: 90_000 },
+      { categoryId: 'housing', limitInCents: 120_000 },
+    ]);
+    await setBudgetLimit(db, '2026-11', 'food', 0);
+    expect((await listBudgetLimits(db, '2026-11')).map((l) => l.categoryId)).toEqual(['housing']);
+    expect(await listBudgetLimits(db, '2026-12')).toEqual([]);
+  });
+
+  it('recusa limite inválido e categoria de receita', async () => {
+    const { db } = await setup();
+    await expect(setBudgetLimit(db, '2026-11', 'food', -1)).rejects.toThrow(RangeError);
+    await expect(setBudgetLimit(db, '2026-11', 'food', 1.5)).rejects.toThrow(RangeError);
+    await expect(setBudgetLimit(db, '2026-11', 'salary', 1000)).rejects.toThrow(RangeError);
+    await expect(setBudgetLimit(db, '2026-11', 'nao-existe', 1000)).rejects.toThrow(RangeError);
+    expect(await listBudgetLimits(db, '2026-11')).toEqual([]);
+  });
+
+  it('lista as transações pelo budget_month, não pela data', async () => {
+    const { db, base } = await setup();
+    await insertTransactions(db, [
+      base({ description: 'Parcela 2', date: '2026-12-10', budgetMonth: '2026-12' }),
+      base({ description: 'Dezembro, mas do mês anterior', date: '2026-12-02', budgetMonth: '2026-11' }),
+      base({ description: 'Novembro', date: '2026-11-10' }),
+    ]);
+    const list = await listTransactionsByBudgetMonth(db, '2026-11');
+    expect(list.map((t) => t.description)).toEqual(['Dezembro, mas do mês anterior', 'Novembro']);
+  });
+
+  it('copia os limites do mês anterior uma única vez e não ressuscita o que foi removido', async () => {
+    const { db } = await setup();
+    await setBudgetLimit(db, '2026-11', 'food', 80_000);
+    await setBudgetLimit(db, '2026-11', 'housing', 120_000);
+    expect(await copyPreviousMonthLimitsIfNew(db, '2026-12')).toBe(2);
+    expect(await listBudgetLimits(db, '2026-12')).toHaveLength(2);
+    await setBudgetLimit(db, '2026-12', 'food', 0);
+    expect(await copyPreviousMonthLimitsIfNew(db, '2026-12')).toBe(0);
+    expect((await listBudgetLimits(db, '2026-12')).map((l) => l.categoryId)).toEqual(['housing']);
+  });
+
+  it('mês anterior sem limites não marca a cópia; não sobrescreve limite já definido', async () => {
+    const { db } = await setup();
+    expect(await copyPreviousMonthLimitsIfNew(db, '2026-12')).toBe(0);
+    await setBudgetLimit(db, '2026-11', 'food', 80_000);
+    await setBudgetLimit(db, '2026-11', 'housing', 120_000);
+    await setBudgetLimit(db, '2026-12', 'food', 50_000);
+    expect(await copyPreviousMonthLimitsIfNew(db, '2026-12')).toBe(1);
+    expect(await listBudgetLimits(db, '2026-12')).toEqual([
+      { categoryId: 'food', limitInCents: 50_000 },
+      { categoryId: 'housing', limitInCents: 120_000 },
+    ]);
   });
 });
 

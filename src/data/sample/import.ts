@@ -5,12 +5,13 @@ import {
   findConnectionByKey,
   getSetting,
   insertAccount,
+  insertBudgetLimitIfMissing,
   insertConnection,
   markConnectionSynced,
   setSetting,
   upsertImportedTransaction,
 } from '../repositories';
-import { SAMPLE_ACCOUNTS, SAMPLE_INSTITUTION } from './catalog';
+import { SAMPLE_ACCOUNTS, SAMPLE_BUDGET_LIMITS, SAMPLE_INSTITUTION } from './catalog';
 import { generateSampleTransactions } from './generate';
 
 /** Chave em `settings` que marca que os dados de exemplo já foram carregados. */
@@ -81,6 +82,11 @@ export async function importSampleData(db: Database, today: LocalDate = todayLoc
         installmentNumber: item.installmentNumber,
         totalInstallments: item.totalInstallments,
       });
+    }
+
+    // Limites do mês corrente: só entram onde ainda não há limite, então restaurar não desfaz o que o usuário mudou.
+    for (const [categoryId, limit] of Object.entries(SAMPLE_BUDGET_LIMITS)) {
+      await insertBudgetLimitIfMissing(db, monthOf(anchor), categoryId, limit);
     }
 
     await markConnectionSynced(db, connectionId, now);
