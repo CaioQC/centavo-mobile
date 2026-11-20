@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 
-import { AppText } from '../../shared/components';
-import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '../../shared/theme';
+import { AppText, Button } from '../../shared/components';
+import { fontFamily, radius, spacing, useTheme } from '../../shared/theme';
 
 interface NoteEditorProps {
   /** observação já gravada ('' quando não há) */
@@ -36,7 +36,9 @@ export function NoteEditor({ initial, onSave }: NoteEditorProps) {
 
   return (
     <View style={styles.root}>
-      <AppText variant="bodyStrong">Observação</AppText>
+      <AppText variant="bodyStrong" accessibilityRole="header">
+        Observação
+      </AppText>
       <TextInput
         accessibilityLabel="Observação"
         placeholder="Escreva uma observação sobre este lançamento"
@@ -54,25 +56,10 @@ export function NoteEditor({ initial, onSave }: NoteEditorProps) {
         </AppText>
       ) : null}
       <View style={styles.footer}>
-        <AppText variant="caption" tone="muted" accessibilityLiveRegion="polite">
+        <AppText variant="caption" tone="muted" accessibilityLiveRegion="polite" style={styles.caption}>
           {!dirty && saved !== '' ? 'Observação salva.' : ''}
         </AppText>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Salvar observação"
-          accessibilityState={{ disabled: !dirty || saving }}
-          disabled={!dirty || saving}
-          onPress={save}
-          style={[styles.button, { backgroundColor: dirty ? colors.accent : colors.track }]}
-        >
-          {saving ? (
-            <ActivityIndicator accessibilityLabel="Salvando" color={colors.onAccent} />
-          ) : (
-            <AppText variant="bodyStrong" style={{ color: dirty ? colors.onAccent : colors.muted }}>
-              Salvar observação
-            </AppText>
-          )}
-        </Pressable>
+        <Button label="Salvar observação" disabled={!dirty} loading={saving} onPress={save} />
       </View>
     </View>
   );
@@ -90,11 +77,5 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  button: {
-    minHeight: MIN_TOUCH_SIZE,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  caption: { flexShrink: 1 },
 });

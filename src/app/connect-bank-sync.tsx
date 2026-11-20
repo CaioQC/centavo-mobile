@@ -138,7 +138,7 @@ export default function ConnectBankSyncScreen() {
 
         <View style={styles.actions}>
           <Button label="Ver extrato" onPress={openStatement} />
-          <Button label="Concluir" variant="secondary" onPress={backToAccounts} />
+          <Button label="Concluir" variant="tonal" onPress={backToAccounts} />
         </View>
       </ScrollView>
     </Screen>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { router } from 'expo-router';
 import { Fingerprint, RotateCcw } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,7 +8,7 @@ import { importSampleData } from '@/data/sample/import';
 import { useDatabase } from '@/data/useDbQuery';
 import { useBiometricLock } from '@/features/lock/BiometricLockProvider';
 import { ThemeSwitch } from '@/features/settings/ThemeSwitch';
-import { AppText, Screen } from '@/shared/components';
+import { AppText, Button, Screen } from '@/shared/components';
 import { MIN_TOUCH_SIZE, radius, spacing, useTheme, useThemePreference } from '@/shared/theme';
 
 export default function SettingsScreen() {
@@ -102,20 +102,13 @@ export default function SettingsScreen() {
           <AppText variant="heading" accessibilityRole="header">
             Dados de exemplo
           </AppText>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: restoring }}
-            disabled={restoring}
+          <Button
+            label="Restaurar dados de exemplo"
+            icon={RotateCcw}
+            variant="tonal"
+            loading={restoring}
             onPress={confirmRestore}
-            style={[styles.row, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
-          >
-            {restoring ? (
-              <ActivityIndicator accessibilityLabel="Restaurando" color={colors.muted} />
-            ) : (
-              <RotateCcw size={20} color={colors.muted} strokeWidth={1.75} />
-            )}
-            <AppText variant="bodyStrong">Restaurar dados de exemplo</AppText>
-          </Pressable>
+          />
           {restoreMessage ? (
             <AppText
               variant="caption"

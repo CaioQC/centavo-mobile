@@ -12,7 +12,7 @@ import type { Database } from '@/data/database';
 import { listBudgetLimits, listCategories, setBudgetLimit } from '@/data/repositories';
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
 import { Field } from '@/features/newTransaction/Field';
-import { AppText, CategoryBadge, EmptyState, Screen } from '@/shared/components';
+import { AppText, Button, CategoryBadge, EmptyState, Screen } from '@/shared/components';
 import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
 
 export default function EditLimitScreen() {
@@ -114,21 +114,7 @@ export default function EditLimitScreen() {
           />
         </Field>
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: saving }}
-          disabled={saving}
-          onPress={() => save(limitInCents)}
-          style={[styles.save, { backgroundColor: colors.accent }]}
-        >
-          {saving ? (
-            <ActivityIndicator accessibilityLabel="Salvando" color={colors.onAccent} />
-          ) : (
-            <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-              Salvar limite
-            </AppText>
-          )}
-        </Pressable>
+        <Button label="Salvar limite" loading={saving} onPress={() => save(limitInCents)} />
 
         {currentLimit !== null ? (
           <Pressable accessibilityRole="button" disabled={saving} onPress={() => save(0)} style={styles.remove}>
@@ -153,12 +139,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.extrabold,
     fontSize: 24,
     fontVariant: ['tabular-nums'],
-  },
-  save: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   remove: { minHeight: MIN_TOUCH_SIZE, alignItems: 'center', justifyContent: 'center' },
 });

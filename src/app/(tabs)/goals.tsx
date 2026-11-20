@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Plus, Target, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,8 +8,8 @@ import type { Database } from '@/data/database';
 import { listGoals } from '@/data/repositories';
 import { useDbQuery } from '@/data/useDbQuery';
 import { GoalCard } from '@/features/goals/GoalCard';
-import { AppText, EmptyState, Screen, TAB_BAR_CLEARANCE } from '@/shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '@/shared/theme';
+import { Button, EmptyState, Screen, TAB_BAR_CLEARANCE } from '@/shared/components';
+import { spacing, useTheme } from '@/shared/theme';
 
 export default function GoalsScreen() {
   const { colors } = useTheme();
@@ -57,12 +57,7 @@ export default function GoalsScreen() {
         {result.data.map((goal) => (
           <GoalCard key={goal.id} goal={goal} onPress={() => router.push(`/goal/${goal.id}`)} />
         ))}
-        <Pressable accessibilityRole="button" onPress={newGoal} style={[styles.add, { backgroundColor: colors.accent }]}>
-          <Plus size={20} color={colors.onAccent} />
-          <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-            Nova meta
-          </AppText>
-        </Pressable>
+        <Button label="Nova meta" icon={Plus} onPress={newGoal} />
       </ScrollView>
     </Screen>
   );
@@ -70,12 +65,4 @@ export default function GoalsScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.lg },
-  add: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    flexDirection: 'row',
-    gap: spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });

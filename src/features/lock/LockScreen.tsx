@@ -1,9 +1,9 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Lock } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppText } from '../../shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '../../shared/theme';
+import { AppText, Button } from '../../shared/components';
+import { radius, spacing, useTheme } from '../../shared/theme';
 
 interface LockScreenProps {
   /** por que o último pedido não deu certo; nulo no primeiro pedido */
@@ -36,15 +36,7 @@ export function LockScreen({ message, onRetry }: LockScreenProps) {
           </AppText>
         ) : null}
       </View>
-      <Pressable
-        accessibilityRole="button"
-        onPress={onRetry}
-        style={[styles.button, { backgroundColor: colors.accent }]}
-      >
-        <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-          Desbloquear
-        </AppText>
-      </Pressable>
+      <Button label="Desbloquear" onPress={onRetry} />
     </View>
   );
 }
@@ -54,10 +46,4 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
   logo: { width: 72, height: 72, borderRadius: radius.cardLarge, alignItems: 'center', justifyContent: 'center' },
   centered: { textAlign: 'center' },
-  button: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });

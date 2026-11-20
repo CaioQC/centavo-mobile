@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowDownToLine, ArrowUpFromLine, Target, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +12,7 @@ import { getGoal, listContributions } from '@/data/repositories';
 import { useDbQuery } from '@/data/useDbQuery';
 import { GoalProgressBar } from '@/features/goals/GoalProgressBar';
 import { remainingText } from '@/features/goals/GoalCard';
-import { AppText, CategoryBadge, EmptyState, Screen } from '@/shared/components';
+import { AppText, Button, CategoryBadge, EmptyState, Screen } from '@/shared/components';
 import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '@/shared/theme';
 
 export default function GoalDetailScreen() {
@@ -95,26 +95,18 @@ export default function GoalDetailScreen() {
         </View>
 
         <View style={styles.actions}>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => openContribution('DEPOSIT')}
-            style={[styles.action, { backgroundColor: colors.accent }]}
-          >
-            <ArrowDownToLine size={20} color={colors.onAccent} />
-            <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-              Novo aporte
-            </AppText>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !canWithdraw }}
-            disabled={!canWithdraw}
-            onPress={() => openContribution('WITHDRAWAL')}
-            style={[styles.action, styles.secondary, { backgroundColor: colors.card, borderColor: colors.cardBorder, opacity: canWithdraw ? 1 : 0.5 }]}
-          >
-            <ArrowUpFromLine size={20} color={colors.text} />
-            <AppText variant="bodyStrong">Retirar</AppText>
-          </Pressable>
+          <View style={styles.action}>
+            <Button label="Novo aporte" icon={ArrowDownToLine} onPress={() => openContribution('DEPOSIT')} />
+          </View>
+          <View style={styles.action}>
+            <Button
+              label="Retirar"
+              icon={ArrowUpFromLine}
+              variant="tonal"
+              disabled={!canWithdraw}
+              onPress={() => openContribution('WITHDRAWAL')}
+            />
+          </View>
         </View>
         {canWithdraw ? null : (
           <AppText variant="caption" tone="muted">
@@ -173,16 +165,7 @@ const styles = StyleSheet.create({
   money: { fontVariant: ['tabular-nums'] },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   actions: { flexDirection: 'row', gap: spacing.md },
-  action: {
-    flex: 1,
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    flexDirection: 'row',
-    gap: spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondary: { borderWidth: 1 },
+  action: { flex: 1 },
   section: { gap: spacing.sm },
   contribution: {
     minHeight: MIN_TOUCH_SIZE + spacing.lg,

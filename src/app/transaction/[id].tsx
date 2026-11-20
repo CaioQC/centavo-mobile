@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ReceiptText, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ import {
 } from '@/data/repositories';
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
 import { NoteEditor } from '@/features/transaction/NoteEditor';
-import { AppText, EmptyState, Screen, SelectField, type SelectOption } from '@/shared/components';
+import { AppText, Button, EmptyState, Screen, SelectField, type SelectOption } from '@/shared/components';
 import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '@/shared/theme';
 
 export default function TransactionDetailScreen() {
@@ -182,15 +182,11 @@ export default function TransactionDetailScreen() {
         <NoteEditor key={transaction.id} initial={transaction.note ?? ''} onSave={saveNote} />
 
         {isManual ? (
-          <Pressable
-            accessibilityRole="button"
+          <Button
+            label={isInstallment ? 'Excluir compra parcelada' : 'Excluir lançamento'}
+            variant="danger"
             onPress={confirmRemove}
-            style={[styles.delete, { borderColor: colors.over }]}
-          >
-            <AppText variant="bodyStrong" style={{ color: colors.over }}>
-              {isInstallment ? 'Excluir compra parcelada' : 'Excluir lançamento'}
-            </AppText>
-          </Pressable>
+          />
         ) : (
           <AppText variant="caption" tone="muted" style={styles.note}>
             Lançamentos importados do banco não podem ser excluídos; só recategorizados e anotados.
@@ -216,12 +212,5 @@ const styles = StyleSheet.create({
   infoValue: { flexShrink: 1, textAlign: 'right' },
   section: { gap: spacing.sm },
   selectRow: { flexDirection: 'row' },
-  delete: {
-    minHeight: MIN_TOUCH_SIZE,
-    borderWidth: 1,
-    borderRadius: radius.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   note: { textAlign: 'center' },
 });
