@@ -23,7 +23,7 @@ import { useDbQuery } from '@/data/useDbQuery';
 import { ShortcutRow } from '@/features/home/ShortcutRow';
 import { SpendingRing } from '@/features/home/SpendingRing';
 import { TransactionRow } from '@/features/statement/TransactionRow';
-import { AppText, CategoryBadge, EmptyState, Screen, TAB_BAR_CLEARANCE } from '@/shared/components';
+import { AppText, Button, CategoryBadge, EmptyState, Screen, TAB_BAR_CLEARANCE } from '@/shared/components';
 import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '@/shared/theme';
 
 const RECENT_COUNT = 5;
@@ -185,7 +185,10 @@ export default function HomeScreen() {
             Onde mais gastou
           </AppText>
           {summary.top.length === 0 ? (
-            <AppText tone="muted">Nenhum gasto em {monthName} ainda.</AppText>
+            <>
+              <AppText tone="muted">Nenhum gasto em {monthName} ainda.</AppText>
+              <Button label="Novo lançamento" variant="tonal" onPress={() => router.push('/new-transaction')} />
+            </>
           ) : (
             summary.top.map((entry) => {
               const category = entry.categoryId ? summary.categoriesById.get(entry.categoryId) : undefined;

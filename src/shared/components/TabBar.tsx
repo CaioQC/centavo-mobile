@@ -66,6 +66,7 @@ export function TabBar({ state, descriptors, emitter, navigateToTab }: TabBarPro
           backgroundColor: colors.card,
           borderColor: colors.cardBorder,
           // Claro: sombra suave. Escuro: só o contorno de 1 px.
+          shadowColor: colors.shadow,
           shadowOpacity: scheme === 'light' ? 0.1 : 0,
           elevation: scheme === 'light' ? 6 : 0,
         },
@@ -99,7 +100,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: radius.cardLarge,
     borderWidth: 1,
-    shadowColor: '#0F1218',
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 12,
   },

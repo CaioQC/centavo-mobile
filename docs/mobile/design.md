@@ -24,6 +24,7 @@ Identidade visual do app mobile: direção **Caderneta**, com tema claro e escur
 | `warn` | `#A15C07` | `#FBBF24` | "Atenção" (a partir de 80% do limite) |
 | `over` | `#C2410C` | `#FB923C` | "Estourou" (acima de 100%) |
 | `income` | `#15803D` | `#86EFAC` | valor de receita |
+| `shadow` | `#0F1218` | `#000000` | sombra da barra de abas flutuante |
 
 No escuro, a sombra dos cartões vira um contorno de 1 px (`#232A36`).
 

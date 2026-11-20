@@ -103,7 +103,7 @@ export default function ConnectBankConsentScreen() {
 
         <View style={styles.actions}>
           <Button label="Autorizar e conectar" onPress={authorize} />
-          <Button label="Cancelar" variant="secondary" onPress={goBack} />
+          <Button label="Cancelar" variant="tonal" onPress={goBack} />
         </View>
       </ScrollView>
     </Screen>

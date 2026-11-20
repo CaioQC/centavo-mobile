@@ -74,7 +74,7 @@ export default function AccountsScreen() {
           ))}
           <View style={styles.actions}>
             <Button label="Conectar banco" icon={Link2} onPress={connectBank} />
-            <Button label="Nova conta manual" icon={Plus} variant="secondary" onPress={newAccount} />
+            <Button label="Nova conta manual" icon={Plus} variant="tonal" onPress={newAccount} />
           </View>
         </ScrollView>
       )}

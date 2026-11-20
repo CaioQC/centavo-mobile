@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Clock, TriangleAlert } from 'lucide-react-native';
+import { Clock, Target, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { buildMonthBudget } from '@/core/budget';
@@ -134,6 +134,16 @@ export default function BudgetScreen() {
             </View>
           ) : null}
         </View>
+
+        {data.categories.length === 0 ? (
+          <EmptyState
+            icon={Target}
+            title="Nenhuma categoria de despesa"
+            message="O orçamento é feito por categoria de despesa, e nenhuma foi encontrada neste aparelho."
+            actionLabel="Tentar de novo"
+            onAction={result.reload}
+          />
+        ) : null}
 
         {data.categories.map((category, index) => (
           <BudgetRow

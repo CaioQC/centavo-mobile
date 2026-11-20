@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { TriangleAlert } from 'lucide-react-native';
+import { Landmark, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { mergeBanksWithConnections } from '@/core/connections';
@@ -44,6 +44,15 @@ export default function ConnectBankScreen() {
         <AppText tone="muted">
           Escolha um banco para simular a conexão. Os bancos são fictícios e os dados são inventados: nada real é lido.
         </AppText>
+        {result.data.length === 0 ? (
+          <EmptyState
+            icon={Landmark}
+            title="Nenhum banco disponível"
+            message="A lista de bancos fictícios está vazia."
+            actionLabel="Voltar"
+            onAction={goBack}
+          />
+        ) : null}
         <View style={styles.list}>
           {result.data.map((bank) => (
             <BankRow

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -17,7 +17,7 @@ import { createGoal } from '@/data/repositories';
 import { useDatabase } from '@/data/useDbQuery';
 import { GoalIconPicker } from '@/features/goals/GoalIconPicker';
 import { Field } from '@/features/newTransaction/Field';
-import { AppText, Screen } from '@/shared/components';
+import { Button, Screen } from '@/shared/components';
 import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
 
 export default function NewGoalScreen() {
@@ -102,21 +102,7 @@ export default function NewGoalScreen() {
           <GoalIconPicker value={icon} onChange={setIcon} />
         </Field>
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: saving }}
-          disabled={saving}
-          onPress={save}
-          style={[styles.save, { backgroundColor: colors.accent }]}
-        >
-          {saving ? (
-            <ActivityIndicator accessibilityLabel="Salvando" color={colors.onAccent} />
-          ) : (
-            <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-              Criar meta
-            </AppText>
-          )}
-        </Pressable>
+        <Button label="Criar meta" loading={saving} onPress={save} />
       </ScrollView>
     </Screen>
   );
@@ -133,10 +119,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   amount: { fontFamily: fontFamily.extrabold, fontSize: 24, fontVariant: ['tabular-nums'] },
-  save: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });

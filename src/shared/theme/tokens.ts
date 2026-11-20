@@ -29,6 +29,8 @@ export interface ColorTokens {
   income: string;
   /** véu atrás das folhas de opções */
   overlay: string;
+  /** cor da sombra da barra de abas flutuante */
+  shadow: string;
 }
 
 export const colors: Record<ColorScheme, ColorTokens> = {
@@ -46,6 +48,7 @@ export const colors: Record<ColorScheme, ColorTokens> = {
     over: '#C2410C',
     income: '#15803D',
     overlay: 'rgba(15, 18, 24, 0.4)',
+    shadow: '#0F1218',
   },
   dark: {
     bg: '#0F1218',
@@ -62,6 +65,7 @@ export const colors: Record<ColorScheme, ColorTokens> = {
     over: '#FB923C',
     income: '#86EFAC',
     overlay: 'rgba(0, 0, 0, 0.6)',
+    shadow: '#000000',
   },
 };
 

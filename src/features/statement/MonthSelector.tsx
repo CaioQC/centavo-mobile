@@ -25,7 +25,7 @@ export function MonthSelector({ month, onChange }: MonthSelectorProps) {
       >
         <ChevronLeft size={22} color={colors.text} />
       </Pressable>
-      <AppText variant="heading" accessibilityLiveRegion="polite">
+      <AppText variant="heading" accessibilityRole="header" accessibilityLiveRegion="polite">
         {label}
       </AppText>
       <Pressable

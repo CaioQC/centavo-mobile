@@ -66,6 +66,7 @@ export function SelectField({ label, value, options, onChange, sheetTitle }: Sel
           <FlatList
             data={options}
             keyExtractor={(option) => option.value ?? '__all__'}
+            ListEmptyComponent={<AppText tone="muted">Nenhuma opção disponível.</AppText>}
             renderItem={({ item }) => {
               const isSelected = item.value === value;
               return (

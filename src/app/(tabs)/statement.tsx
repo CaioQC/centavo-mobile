@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { SectionList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, SectionList, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { ReceiptText, Search, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -91,7 +91,7 @@ export default function StatementScreen() {
     </View>
   );
 
-  let empty = null; // enquanto a primeira carga não termina, a lista fica em branco
+  let empty = null;
   if (result.status === 'error' && !data) {
     empty = (
       <EmptyState
@@ -103,7 +103,7 @@ export default function StatementScreen() {
       />
     );
   } else if (!data) {
-    empty = null;
+    empty = <ActivityIndicator accessibilityLabel="Carregando" color={colors.muted} />;
   } else if (hasFilters) {
     empty = (
       <EmptyState

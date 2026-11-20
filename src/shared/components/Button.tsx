@@ -9,8 +9,8 @@ interface ButtonProps {
   label: string;
   onPress: () => void;
   icon?: ComponentType<LucideProps>;
-  /** `primary` é o botão azul da ação principal; `secondary` é o cartão com contorno; `tonal` tem fundo de trilha, para ficar visível dentro de um cartão. */
-  variant?: 'primary' | 'secondary' | 'tonal';
+  /** `primary` é o botão azul da ação principal; `secondary` é o cartão com contorno (no tema claro o cartão não tem contorno: fora de um cartão prefira `tonal`); `tonal` tem fundo de trilha, para ficar visível dentro de um cartão ou sobre o fundo; `danger` é a ação destrutiva (excluir), com contorno e texto na cor `over`. */
+  variant?: 'primary' | 'secondary' | 'tonal' | 'danger';
   disabled?: boolean;
   /** Mostra um indicador no lugar do ícone e bloqueia o toque. */
   loading?: boolean;
@@ -21,7 +21,7 @@ export function Button({ label, onPress, icon: Icon, variant = 'primary', disabl
   const { colors } = useTheme();
   const primary = variant === 'primary';
   const blocked = disabled || loading;
-  const foreground = primary ? colors.onAccent : colors.text;
+  const foreground = primary ? colors.onAccent : variant === 'danger' ? colors.over : colors.text;
   return (
     <Pressable
       accessibilityRole="button"
@@ -35,7 +35,9 @@ export function Button({ label, onPress, icon: Icon, variant = 'primary', disabl
           ? { backgroundColor: colors.accent }
           : variant === 'tonal'
             ? { backgroundColor: colors.track }
-            : { backgroundColor: colors.card, borderColor: colors.cardBorder, borderWidth: 1 },
+            : variant === 'danger'
+              ? { borderColor: colors.over, borderWidth: 1 }
+              : { backgroundColor: colors.card, borderColor: colors.cardBorder, borderWidth: 1 },
         { opacity: disabled ? 0.5 : 1 },
       ]}
     >

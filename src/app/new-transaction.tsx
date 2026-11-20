@@ -19,7 +19,7 @@ import { createManualTransactions, listAccounts, listCategories } from '@/data/r
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
 import { Field } from '@/features/newTransaction/Field';
 import { KindSwitch } from '@/features/newTransaction/KindSwitch';
-import { AppText, EmptyState, Screen, SelectField, type SelectOption } from '@/shared/components';
+import { AppText, Button, EmptyState, Screen, SelectField, type SelectOption } from '@/shared/components';
 import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
 
 const INSTALLMENT_CHOICES = Array.from({ length: 12 }, (_, index) => index + 1);
@@ -247,21 +247,7 @@ export default function NewTransactionScreen() {
           </Field>
         ) : null}
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: saving }}
-          disabled={saving}
-          onPress={save}
-          style={[styles.save, { backgroundColor: colors.accent }]}
-        >
-          {saving ? (
-            <ActivityIndicator accessibilityLabel="Salvando" color={colors.onAccent} />
-          ) : (
-            <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-              Salvar lançamento
-            </AppText>
-          )}
-        </Pressable>
+        <Button label="Salvar lançamento" loading={saving} onPress={save} />
       </ScrollView>
     </Screen>
   );
@@ -286,10 +272,4 @@ const styles = StyleSheet.create({
   dateRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   dateInput: { flex: 1 },
   today: { minHeight: MIN_TOUCH_SIZE, minWidth: MIN_TOUCH_SIZE, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md },
-  save: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });

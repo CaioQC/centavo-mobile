@@ -22,7 +22,7 @@ export function EmptyState({ icon: Icon, title, message, actionLabel, onAction }
       <View style={[styles.iconBox, { backgroundColor: colors.track }]}>
         <Icon size={24} color={colors.muted} strokeWidth={1.75} />
       </View>
-      <AppText variant="heading" style={styles.centered}>
+      <AppText variant="heading" accessibilityRole="header" style={styles.centered}>
         {title}
       </AppText>
       <AppText tone="muted" style={styles.centered}>

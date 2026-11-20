@@ -12,7 +12,7 @@ import type { Database } from '@/data/database';
 import { addContribution, ContributionExceedsBalanceError, getGoal } from '@/data/repositories';
 import { useDatabase, useDbQuery } from '@/data/useDbQuery';
 import { Field } from '@/features/newTransaction/Field';
-import { AppText, EmptyState, Screen } from '@/shared/components';
+import { AppText, Button, EmptyState, Screen } from '@/shared/components';
 import { MIN_TOUCH_SIZE, fontFamily, radius, spacing, useTheme } from '@/shared/theme';
 
 export default function GoalContributionScreen() {
@@ -135,21 +135,7 @@ export default function GoalContributionScreen() {
           </View>
         </Field>
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: saving }}
-          disabled={saving}
-          onPress={save}
-          style={[styles.save, { backgroundColor: colors.accent }]}
-        >
-          {saving ? (
-            <ActivityIndicator accessibilityLabel="Salvando" color={colors.onAccent} />
-          ) : (
-            <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-              {isWithdrawal ? 'Registrar retirada' : 'Registrar aporte'}
-            </AppText>
-          )}
-        </Pressable>
+        <Button label={isWithdrawal ? 'Registrar retirada' : 'Registrar aporte'} loading={saving} onPress={save} />
       </ScrollView>
     </Screen>
   );
@@ -169,10 +155,4 @@ const styles = StyleSheet.create({
   dateRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   dateInput: { flex: 1 },
   today: { minHeight: MIN_TOUCH_SIZE, minWidth: MIN_TOUCH_SIZE, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md },
-  save: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 });
