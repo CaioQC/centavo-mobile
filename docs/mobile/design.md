@@ -47,3 +47,6 @@ Cada categoria tem uma cor: no claro, ícone na cor forte sobre fundo pastel; no
 - **Área de toque** mínima de 44 × 44 px.
 - **Formas:** cartões com raio 18–24, ícones de categoria em quadrados de raio 11–13, barra de abas flutuante com o botão "+" no centro.
 - **Sem emoji** na interface; ícones em traço (estilo Lucide).
+
+## Ícone e splash
+Marca própria, sem imitar instituição real: um **"C" branco** (a moeda do centavo) sobre o azul `accent`. Ícone, ícone adaptativo do Android (primeiro plano; fundo `#2F54EB`), splash (o mesmo quadrado arredondado da tela de desbloqueio, sobre `bg` claro `#F3F5F9` ou escuro `#0F1218`) e favicon ficam em `assets/` e são gerados por `npm run assets` ([scripts/generate-assets.mjs](../../scripts/generate-assets.mjs)), sem editor de imagem. As cores do `app.json` repetem os tokens porque a configuração nativa não lê `src/shared`. **O Expo Go mostra o próprio ícone e a própria splash:** a identidade só aparece num *development build* ou num APK.
