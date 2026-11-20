@@ -7,12 +7,15 @@ import {
   insertAccount,
   insertBudgetLimitIfMissing,
   insertConnection,
+  insertContributionIfMissing,
+  insertGoalIfMissing,
   markConnectionSynced,
   setSetting,
   upsertImportedTransaction,
 } from '../repositories';
 import { SAMPLE_ACCOUNTS, SAMPLE_BUDGET_LIMITS, SAMPLE_INSTITUTION } from './catalog';
 import { generateSampleTransactions } from './generate';
+import { generateSampleGoals } from './goals';
 
 /** Chave em `settings` que marca que os dados de exemplo já foram carregados. */
 export const SAMPLE_DATA_VERSION_KEY = 'sample_data_version';
@@ -88,6 +91,11 @@ export async function importSampleData(db: Database, today: LocalDate = todayLoc
     for (const [categoryId, limit] of Object.entries(SAMPLE_BUDGET_LIMITS)) {
       await insertBudgetLimitIfMissing(db, monthOf(anchor), categoryId, limit);
     }
+
+    // Metas de exemplo: IDs fixos, então restaurar não duplica nem desfaz o que o usuário registrou.
+    const sampleGoals = generateSampleGoals(anchor);
+    for (const goal of sampleGoals.goals) await insertGoalIfMissing(db, goal, now);
+    for (const contribution of sampleGoals.contributions) await insertContributionIfMissing(db, contribution);
 
     await markConnectionSynced(db, connectionId, now);
     await setSetting(db, SAMPLE_DATA_ANCHOR_KEY, anchor);

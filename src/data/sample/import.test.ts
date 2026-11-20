@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { listAccounts, listBudgetLimits, setBudgetLimit, listTransactionsByMonth, updateTransactionCategory, updateTransactionNote } from '../repositories';
+import { addContribution, listAccounts, listBudgetLimits, listContributions, listGoals, setBudgetLimit, listTransactionsByMonth, updateTransactionCategory, updateTransactionNote } from '../repositories';
 import { createTestDatabase } from '../testing/createTestDatabase';
 import { generateSampleTransactions } from './generate';
 import { importSampleData, seedSampleDataIfNeeded } from './import';
@@ -36,6 +36,19 @@ describe('importSampleData', () => {
     await importSampleData(db, TODAY);
     expect((await listBudgetLimits(db, '2026-11')).find((l) => l.categoryId === 'food')?.limitInCents).toBe(12_345);
     expect(await listBudgetLimits(db, '2026-10')).toEqual([]);
+  });
+
+  it('traz metas com aportes e restaurar não duplica nem desfaz o que o usuário registrou', async () => {
+    const { db } = await createTestDatabase();
+    await importSampleData(db, TODAY);
+    const goals = await listGoals(db);
+    expect(goals.map((g) => g.name)).toEqual(['Viagem de fim de ano', 'Reserva de emergência']);
+    const viagem = goals.find((g) => g.id === 'sample-goal-viagem')!;
+    expect(viagem.savedInCents).toBeGreaterThan(0);
+    await addContribution(db, viagem.id, 'DEPOSIT', 10_000, TODAY);
+    await importSampleData(db, TODAY);
+    expect(await listGoals(db)).toHaveLength(2);
+    expect((await listContributions(db, viagem.id)).some((c) => c.amountInCents === 10_000)).toBe(true);
   });
 
   it('importar de novo não duplica nada', async () => {
