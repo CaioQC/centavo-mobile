@@ -5,14 +5,31 @@
     "scheme": "centavo",
     "version": "0.1.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": { "supportsTablet": false },
-    "android": { "package": "br.com.caioqc.centavo" },
+    "android": {
+      "package": "br.com.caioqc.centavo",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#2F54EB"
+      }
+    },
+    "web": { "favicon": "./assets/favicon.png" },
     "plugins": [
       "expo-router",
       "expo-sqlite",
       "expo-font",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#F3F5F9",
+          "dark": { "image": "./assets/splash-icon.png", "backgroundColor": "#0F1218" }
+        }
+      ],
       ["expo-local-authentication", { "faceIDPermission": "O Centavo usa o Face ID para abrir o app." }]
     ]
   }
