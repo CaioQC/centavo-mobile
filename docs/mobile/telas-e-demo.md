@@ -30,7 +30,7 @@ flowchart LR
 | **Metas** | Cartões com nome, progresso e quanto falta. "Nova meta". |
 | **Detalhe da meta** | Progresso, data-alvo, lista de aportes, "Novo aporte" e "Retirar". |
 | **Contas e conexões** | Contas agrupadas por banco, com saldo; "Nova conta manual"; "Conectar banco". |
-| **Conectar banco simulado** | Lista de bancos fictícios → consentimento (que dados serão lidos, com o aviso "simulação") → "Sincronizando…" → resumo do que foi importado. |
+| **Conectar banco simulado** | Lista de bancos fictícios → consentimento (que dados serão lidos, com o aviso "simulação") → "Sincronizando…" → resumo do que foi importado (contas e transações novas). Banco já conectado aparece como conectado, com "Sincronizar de novo". |
 | **Ajustes** | Desbloqueio por biometria liga/desliga; tema (Sistema, Claro, Escuro); "Restaurar dados de exemplo". |
 
 Toda lista tem estado vazio com uma ação (ex.: "Nenhuma meta ainda. Criar meta").
