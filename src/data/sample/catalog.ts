@@ -1,17 +1,17 @@
-import type { AccountType } from '../types';
+import type { BankAccount } from '../banks/types';
 
 // Banco, contas e valores 100% inventados: o nome não imita nenhuma instituição real (CLAUDE.md).
 
 export const SAMPLE_INSTITUTION = { key: 'jabuticaba', name: 'Banco Jabuticaba' } as const;
 
-export interface SampleAccount {
-  /** ID da conta no banco fictício (único por conexão) */
-  externalId: string;
-  name: string;
-  type: AccountType;
-  initialBalanceInCents: number;
-  creditLimitInCents: number | null;
-}
+/**
+ * Chave em `settings` com o dia que ancora os dados de exemplo (o "hoje" da primeira importação).
+ * Reimportar usa sempre a mesma âncora: as chaves e os valores não mudam, então restaurar os
+ * dados em outro mês não duplica a compra parcelada nem altera valores já gravados.
+ */
+export const SAMPLE_DATA_ANCHOR_KEY = 'sample_data_anchor';
+
+export type SampleAccount = BankAccount;
 
 export const SAMPLE_CHECKING_ID = 'cc-0001';
 export const SAMPLE_CARD_ID = 'cartao-0001';

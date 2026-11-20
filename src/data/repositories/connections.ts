@@ -5,6 +5,11 @@ import type { Connection } from '../types';
 const COLUMNS = `id, institution_key AS institutionKey, institution_name AS institutionName,
   connected_at AS connectedAt, last_synced_at AS lastSyncedAt`;
 
+/** Bancos conectados, do mais antigo para o mais novo. */
+export function listConnections(db: Database): Promise<Connection[]> {
+  return db.getAllAsync<Connection>(`SELECT ${COLUMNS} FROM connections ORDER BY connected_at, id`, []);
+}
+
 export function findConnectionByKey(db: Database, institutionKey: string): Promise<Connection | null> {
   return db.getFirstAsync<Connection>(`SELECT ${COLUMNS} FROM connections WHERE institution_key = ?`, [
     institutionKey,
