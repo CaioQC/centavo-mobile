@@ -10,6 +10,6 @@ Prazo: **1 a 2 semanas** a partir de 14/11/2026, até o vídeo e a apresentaçã
 | 3. Orçamento | ✅ Concluída | Limites por categoria e mês, cópia do mês anterior, "já comprometido" ([orçamento do mês](../fluxos/orcamento-do-mes.md)). |
 | 4. Metas | ✅ Concluída | Metas com valor-alvo e data opcional, cartões de progresso, detalhe com aportes e retiradas. |
 | 5. Conexão simulada | ✅ Concluída | Catálogo de bancos fictícios, consentimento, importação sem duplicar e sem sobrescrever o que o usuário mudou. |
-| 6. Polimento e vídeo | ⬜ Não iniciada | Ícone, splash, estados vazios, revisão de UX no aparelho, gravação do vídeo de ~30 s e ensaio da apresentação. |
+| 6. Polimento e vídeo | ✅ Concluída | Ícone e splash, botões e estados vazios, de carregamento e de erro revisados em todas as telas, roteiro de ensaio e lista de conferência no aparelho ([ensaio e vídeo](ensaio-e-video.md)). A conferência no celular e a gravação do vídeo de ~30 s são do Caio. |
 
 Status: ⬜ não iniciada · 🟨 em andamento · ✅ concluída. Cada etapa vira uma Milestone no GitHub do centavo-mobile, com uma Issue por entrega ([fluxo de git do app](fluxo-de-git.md)).
