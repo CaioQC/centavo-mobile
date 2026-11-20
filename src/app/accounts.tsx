@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Landmark, Plus, TriangleAlert } from 'lucide-react-native';
+import { Landmark, Link2, Plus, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { groupAccountsByBank } from '@/core/accounts';
@@ -10,8 +10,8 @@ import type { Database } from '@/data/database';
 import { listAccountsWithBalance } from '@/data/repositories';
 import { useDbQuery } from '@/data/useDbQuery';
 import { AccountRow } from '@/features/accounts/AccountRow';
-import { AppText, EmptyState, Screen } from '@/shared/components';
-import { MIN_TOUCH_SIZE, radius, spacing, useTheme } from '@/shared/theme';
+import { AppText, Button, EmptyState, Screen } from '@/shared/components';
+import { spacing, useTheme } from '@/shared/theme';
 
 export default function AccountsScreen() {
   const { colors } = useTheme();
@@ -20,6 +20,7 @@ export default function AccountsScreen() {
   const result = useDbQuery(load);
   const goBack = () => router.back();
   const newAccount = () => router.push('/new-account');
+  const connectBank = () => router.push('/connect-bank');
 
   if (!result.data) {
     return (
@@ -44,13 +45,16 @@ export default function AccountsScreen() {
   return (
     <Screen title="Contas e conexões" onBack={goBack}>
       {groups.length === 0 ? (
-        <EmptyState
-          icon={Landmark}
-          title="Nenhuma conta ainda"
-          message="Crie uma conta manual para começar a registrar seus lançamentos."
-          actionLabel="Nova conta manual"
-          onAction={newAccount}
-        />
+        <View style={styles.empty}>
+          <EmptyState
+            icon={Landmark}
+            title="Nenhuma conta ainda"
+            message="Conecte um banco fictício ou crie uma conta manual para começar a registrar seus lançamentos."
+            actionLabel="Nova conta manual"
+            onAction={newAccount}
+          />
+          <Button label="Conectar banco" icon={Link2} onPress={connectBank} />
+        </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}>
           {groups.map((group) => (
@@ -68,16 +72,10 @@ export default function AccountsScreen() {
               ))}
             </View>
           ))}
-          <Pressable
-            accessibilityRole="button"
-            onPress={newAccount}
-            style={[styles.add, { backgroundColor: colors.accent }]}
-          >
-            <Plus size={20} color={colors.onAccent} />
-            <AppText variant="bodyStrong" style={{ color: colors.onAccent }}>
-              Nova conta manual
-            </AppText>
-          </Pressable>
+          <View style={styles.actions}>
+            <Button label="Conectar banco" icon={Link2} onPress={connectBank} />
+            <Button label="Nova conta manual" icon={Plus} variant="secondary" onPress={newAccount} />
+          </View>
         </ScrollView>
       )}
     </Screen>
@@ -88,12 +86,6 @@ const styles = StyleSheet.create({
   content: { gap: spacing.xl },
   group: { gap: spacing.sm },
   groupHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  add: {
-    minHeight: MIN_TOUCH_SIZE + spacing.sm,
-    flexDirection: 'row',
-    gap: spacing.sm,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  empty: { gap: spacing.lg },
+  actions: { gap: spacing.sm },
 });
