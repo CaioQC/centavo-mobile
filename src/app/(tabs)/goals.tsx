@@ -55,7 +55,7 @@ export default function GoalsScreen() {
     <Screen title="Metas" bottomInset={bottomInset}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         {result.data.map((goal) => (
-          <GoalCard key={goal.id} goal={goal} />
+          <GoalCard key={goal.id} goal={goal} onPress={() => router.push(`/goal/${goal.id}`)} />
         ))}
         <Pressable accessibilityRole="button" onPress={newGoal} style={[styles.add, { backgroundColor: colors.accent }]}>
           <Plus size={20} color={colors.onAccent} />
