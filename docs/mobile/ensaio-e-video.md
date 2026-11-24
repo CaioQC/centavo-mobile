@@ -1,14 +1,23 @@
 # Ensaio, vídeo e apresentação
 
-Roteiro prático para gravar o vídeo de ~30 s e apresentar o app em sala. As cenas e o que cada uma prova vêm do [roteiro da demo](telas-e-demo.md); aqui estão os toques, a fala e o plano B. O app **só roda no aparelho** (Expo Go): a conferência final é do Caio.
+Roteiro prático para gravar o vídeo de ~30 s e apresentar o app em sala. As cenas e o que cada uma prova vêm do [roteiro da demo](telas-e-demo.md); aqui estão os toques, a fala e o plano B. O app roda no celular como **APK** (gerado pelo EAS Build, ver abaixo) ou, para desenvolver, no Expo Go. A conferência final é do Caio.
+
+## Gerar e instalar o APK
+O APK é o app de verdade, sem Expo Go: funciona sem Wi-Fi nem PC e mostra o ícone e a splash do Centavo.
+
+1. No terminal do projeto (PowerShell; use `npx.cmd`, porque `npx` é bloqueado pela política de scripts do Windows): `npx.cmd eas-cli login`, só na primeira vez.
+2. `npx.cmd eas-cli build -p android --profile preview` (o perfil está no `eas.json`). Responda **n** à pergunta "Install and run the Android build on an emulator?".
+3. O build roda na nuvem (10 a 30 min). Acompanhe em **expo.dev**, projeto **centavo-mobile**, aba **Builds**. Quando o status for **Finished**, abra a página no celular e baixe o `.apk`.
+4. Instale (o Android pede para liberar "instalar de fontes desconhecidas" na primeira vez). Uma correção de código só chega ao celular com um **build novo**.
 
 ## Antes de gravar
-1. No PC: `npm.cmd start` (abre o Expo Go; o celular precisa estar na mesma rede Wi-Fi do PC). Escaneie o QR code com o Expo Go.
-2. **Estado limpo.** "Restaurar dados de exemplo" só **recoloca o que faltar**: não desconecta banco, não apaga lançamento e não desfaz categoria trocada. Para repetir a demo do zero, apague os dados do Expo Go (Android: Configurações → Apps → Expo Go → Armazenamento → Limpar dados) e abra o projeto de novo; os dados de exemplo voltam sozinhos na primeira abertura.
-3. Aparelho Android com digital (ou PIN) cadastrada. No iOS o Face ID não funciona no Expo Go; ele cai no PIN do aparelho.
+1. **Estado limpo.** "Restaurar dados de exemplo" só **recoloca o que faltar**: não desconecta banco, não apaga lançamento, não desfaz categoria trocada nem aporte. Para repetir a demo do zero, **limpe os dados do app** (Android: Configurações → Apps → Centavo → Armazenamento → Limpar dados) e abra de novo; os dados de exemplo voltam sozinhos na primeira abertura, com a data do dia como referência.
+2. **Limpe no dia da gravação e no da aula.** As datas dos dados de exemplo ficam ancoradas no dia da primeira abertura; instalar muito antes pode deixar o mês atual vazio. Depois de limpar, só abra o app: não percorra o roteiro antes de gravar.
+3. Aparelho Android com digital, PIN, padrão ou senha cadastrada. A limpeza também apaga o ajuste do desbloqueio, que volta **ligado**.
 4. Tema **Claro** (Ajustes → Tema), brilho alto, notificações desligadas (modo Não perturbe), bateria acima de 30 %.
-5. O Expo Go mostra o próprio ícone e a própria splash; o ícone e a splash do Centavo só aparecem num *development build* ou APK. Não filme a tela inicial do celular.
-6. Gravação de tela do próprio celular, na vertical. Ensaie 2 ou 3 vezes antes (passos 1 a 2 entre as tentativas).
+5. Gravação de tela do próprio celular, na vertical. Ensaie 2 ou 3 vezes antes, limpando os dados entre as tentativas.
+
+*Expo Go, só para desenvolver:* `npm.cmd start` e escaneie o QR code (celular e PC na mesma rede Wi-Fi). Ele mostra o próprio ícone e a própria splash, e o Face ID não funciona nele no iOS.
 
 ## Cena a cena
 | Tempo | Toques | Fala sugerida |
@@ -32,8 +41,8 @@ Dicas: o campo de valor recebe só dígitos (`30000` vira R$ 300,00). Antes de g
 | Se… | Faça |
 |---|---|
 | A digital falhar | O app aceita o PIN do aparelho. Se travar de vez, desligue o bloqueio no celular de teste antes de gravar (Ajustes → Desbloqueio por biometria). |
-| Expo Go não conectar | Tente `npm.cmd start` com `--tunnel` (precisa do pacote `@expo/ngrok`) ou use o hotspot do celular. Último recurso: gravar o vídeo no emulador Android. |
-| Banco Pitanga já conectado | Use **Caju** ou **Sincronizar de novo** (não duplica). Para a demo inédita, limpe os dados (passo 2 acima). |
+| O APK não instala | Libere "instalar de fontes desconhecidas" para o navegador ou o gerenciador de arquivos usado. Se o build falhou, abra o log na página do build e corrija; como reserva, use o Expo Go com `npm.cmd start`. |
+| Banco Pitanga já conectado | Use **Caju** ou **Sincronizar de novo** (não duplica). Para a demo inédita, limpe os dados do app ("Antes de gravar", passo 1). |
 | Cartão sem parcela | A opção Parcelas só aparece com uma conta de **cartão** e tipo **despesa**. Troque a conta. |
 | Algo quebrar ao vivo | Mostre o vídeo gravado e comente as telas. Mantenha o arquivo no celular e no PC. |
 
@@ -47,7 +56,6 @@ Marque cada item no celular, nos dois temas (Ajustes → Tema) e, se der, em out
 - [ ] Lançamento de R$ 300 em 3x no cartão: três parcelas no extrato (1/3, 2/3, 3/3); orçamento do mês com R$ 100 e o próximo mês com "Já comprometido R$ 100".
 - [ ] Aporte numa meta: a barra e o "falta" atualizam; retirar volta o valor.
 - [ ] Nenhum texto cortado, botão menor que o dedo ou barra de abas cobrindo conteúdo; lista longa rola até o fim.
-- [ ] Listas vazias mostram a mensagem e a ação (use um banco de dados limpo e navegue sem os dados de exemplo).
 - [ ] Teclado não cobre o botão de salvar nos formulários.
 - [ ] Leitor de tela (TalkBack): botões só com ícone têm nome e os títulos são anunciados como cabeçalhos.
 - [ ] Sem erro vermelho nem aviso amarelo durante o roteiro inteiro.
