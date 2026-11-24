@@ -4,6 +4,12 @@ Diário das decisões do projeto: o que foi decidido, **por quê** e o que foi d
 
 ---
 
+### 2026-11-23: Pluggy real no app mobile: mapeada, não implementada
+- **Decisão:** o app continua só com a conexão simulada. Conectar a Pluggy (inclusive o sandbox do Meu Pluggy) ficou **mapeado** em [Pluggy real no app mobile](../mobile/pluggy-real-no-mobile.md), sem código, para depois da entrega. Os trechos que o Caio trouxe (`POST /auth` e `POST /connect_token`, o widget Pluggy Connect de navegador e o endpoint de webhook) vão como referência dessa nota e como pendência a conferir na documentação, não como fato verificado.
+- **Motivo:** a integração exige um servidor (o *client secret* não pode ficar no app nem no repositório público), traria dado bancário real e deixaria a demo dependente de internet e de serviço externo, a poucos dias da entrega.
+- **Alternativas descartadas:** servidor mínimo neste repositório (experimento sem uso, pois o app não chama o servidor); implementar no app com a chave embutida (expõe as credenciais).
+- **Afeta:** [escopo](../mobile/escopo.md), [pendências da Pluggy](../pluggy/pendencias.md)
+
 ### 2026-11-20: Polimento: marca "C", botões num só componente e demo repetida com dados limpos
 - **Decisão:** a identidade do app é um **"C" branco** sobre o azul `accent` (ícone, ícone adaptativo, splash e favicon em `assets/`, gerados por `npm run assets` sem editor de imagem). Toda ação das telas usa o `Button` de `src/shared/components`, que ganhou a variante `danger` (contorno e texto `over`, para excluir); fora de cartão no tema claro o botão é `tonal`, porque o `secondary` não tem contorno ali (os cartões do tema claro continuam sem contorno, como o [design](../mobile/design.md) descreve). A sombra da barra de abas virou o token `shadow`. "Restaurar dados de exemplo" continua só **recolocando o que faltar**; para repetir a demo do zero, o roteiro de ensaio manda apagar os dados do Expo Go.
 - **Motivo:** uma marca própria evita parecer com instituição real; um botão só garante área de toque de 44 px, estados de carregamento e tema escuro iguais em toda tela; um "apagar tudo" no app seria escopo novo e destrutivo para uma demo de 30 s.

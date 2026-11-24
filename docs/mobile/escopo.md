@@ -20,7 +20,7 @@ O que o app da disciplina faz, o que fica de fora e quais regras do Centavo comp
 ## Fica de fora
 | Do Centavo completo | Por quê |
 |---|---|
-| Pluggy real, Meu Pluggy, webhook, reconciliação, filas | Exigem back-end (o *client secret* não pode ficar no app) e trariam dado bancário real para uma apresentação em sala. |
+| Pluggy real, Meu Pluggy, webhook, reconciliação, filas | Exigem back-end (o *client secret* não pode ficar no app) e trariam dado bancário real para uma apresentação em sala. O que seria preciso está mapeado em [Pluggy real no app mobile](pluggy-real-no-mobile.md). |
 | Back-end AdonisJS, PostgreSQL, Redis, Docker | Sem back-end: os dados ficam no aparelho ([ADR 05](../adr/adr-05-offline-first-mobile.md)). |
 | Login com senha e 2FA TOTP | Substituídos pelo desbloqueio por biometria do aparelho. |
 | Projeção de fatura, faturas, assinaturas | Fora do prazo de 1 a 2 semanas. O cartão aparece como conta, com o gasto do mês. |
