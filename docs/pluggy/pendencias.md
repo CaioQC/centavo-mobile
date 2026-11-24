@@ -6,6 +6,7 @@ A documentação da Pluggy não responde estes pontos; eles só se resolvem olha
 - [ ] Os itens do Meu Pluggy trazem `providerId`? Se sempre trouxerem, a impressão digital da [ADR 09](../adr/adr-09-anotacoes-sobrevivem-troca-de-id.md) vira só reserva.
 - [ ] Como **cada um dos seus bancos** data as parcelas e se lança todas de uma vez. Afeta [ADR 11](../adr/adr-11-orcamento-cartao-parcelado.md).
 - [ ] Os investimentos trazem o valor aplicado (custo de compra), além do saldo? Afeta o [apoio ao IR](../fluxos/imposto-de-renda.md).
+- [ ] (app mobile) Conferir na documentação da Pluggy os dois passos do servidor, `POST /auth` e `POST /connect_token` (com `clientUserId`), o widget Pluggy Connect no React Native (o exemplo colado é de navegador), a regra de responder o webhook com 2XX em até 5 s e o que o sandbox do Meu Pluggy oferece. Os trechos vieram colados, sem fonte; ver [Pluggy real no app mobile](../mobile/pluggy-real-no-mobile.md).
 - [ ] A renovação anual mantém ou troca o Item ID? Afeta a [conexão de banco](../fluxos/conexao-meu-pluggy.md). Só dá para confirmar na primeira renovação.
 
 **Como:** um script baixa o JSON bruto de contas, transações e faturas de cada item. O bruto fica fora do git (tem dados reais); uma versão anonimizada vira fixture dos [testes](../arquitetura/testes.md).
