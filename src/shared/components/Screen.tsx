@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 
@@ -16,7 +16,7 @@ interface ScreenProps {
   scroll?: boolean;
   /** Espaço entre os blocos do conteúdo rolável. */
   gap?: number;
-  /** Conteúdo rolável de formulário: o teclado empurra o conteúdo e o toque num botão não é engolido por ele. */
+  /** Conteúdo rolável de formulário: o teclado não cobre o campo (iOS: ajuste do próprio ScrollView; Android: `KeyboardAvoidingView`) e o toque num botão não é engolido por ele. */
   form?: boolean;
   children: ReactNode;
 }
@@ -40,7 +40,7 @@ export function Screen({ title, bottomInset = 0, onBack, scroll = false, gap = s
       <AppText variant="title" accessibilityRole="header">
         {title}
       </AppText>
-      <View style={styles.content}>
+      <KeyboardAvoidingView style={styles.content} enabled={form && Platform.OS === 'android'} behavior="padding">
         {scroll ? (
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -54,7 +54,7 @@ export function Screen({ title, bottomInset = 0, onBack, scroll = false, gap = s
         ) : (
           children
         )}
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
